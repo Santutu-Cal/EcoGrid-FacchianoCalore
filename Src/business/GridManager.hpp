@@ -16,25 +16,21 @@ class GridManager
 {
 private:
     std::vector<Orden> ordenes;
+    std::vector<TransaccionEnergia> transacciones;
     bMap bidMap; 
     aMap askMap; 
 
 public:
-    void cargarLibroDeOrdenes(const std::string& nombreArchivo);
-    void procesarTick(const std::string& nombreArchivo);
+    void cargarLibroDeOrdenes();
+    void procesarTick();
     /*
     en la praćtica procesarTick le pasará como argumento el nombre del archivo a
     cargarLibroDeOrdenes.
     */
 };
 
-//implementación de métodos
-void GridManager::cargarLibroDeOrdenes(const std::string& nombreArchivo)
+void GridManager::cargarLibroDeOrdenes()
 {
-    //leer archivo .csv y obtener el vector<Orden> ordenes
-    LectorCSV lector;
-    this->ordenes = lector.leerOrdenes(nombreArchivo);
-
     for(const auto& orden : this->ordenes)
     {
         if(orden.esCompra)
@@ -52,61 +48,82 @@ void GridManager::cargarLibroDeOrdenes(const std::string& nombreArchivo)
 
 /*
 procesarTick:
-Tomár la mejor orden de compra y venta.
-Generár la transacción (si hay matching).
-Actualizár los kWh remanentes.
-Eliminár las órdenes que quedaron completas.
-Si una cola de un determinado precio queda vacía, eliminár esa entrada del mapa.
-Volvér a evaluar la condición del while.
+!) Tomár la mejor orden de compra y venta.
+2) Generár la transacción (si hay matching).
+3) Actualizár los kWh remanentes.
+4) Eliminár las órdenes que quedaron completas.
+5) Si una cola de un determinado precio queda vacía, eliminar esa entrada.
+6) Volvér a evaluar la condición del while.
 */
-void GridManager::procesarTick(const std::string& nombreArchivo)
+void GridManager::procesarTick()
 {
+    
     /*
-    limpio las estructuras de datos para que no quede basura de anteriores ticks
+    limpio las estructuras de datos para que no quede basura de anteriores 
+    ticks
     */
     this->bidMap.clear();
     this->askMap.clear();
-
-    cargarLibroDeOrdenes(nombreArchivo);
 
     while(!this->bidMap.empty() && !this->askMap.empty())
     {
         auto mejorBid = this->bidMap.begin();
         auto mejorAsk = this->askMap.begin();
-
-        //spread = bid >= ask
+    
+        //spread: bid >= ask
         if(mejorBid->first >= mejorAsk->first)
         //si hay match
         {
             /*
             se usa "second.front" porque el valor es de tipo:
             queue<Orden>
+            por lo tanto sacar el primero que entró
             */
             Orden ordenCompra = mejorBid->second.front();
             Orden ordenVenta = mejorAsk->second.front();
 
             //iniciar transaccion
+            //cantidad de energia transaccionada
             double energia = std::min(ordenCompra.kwh, ordenVenta.kwh);
+
+            //precio de transaccion
             double precio = (ordenCompra.precio + ordenVenta.precio) / 2;
             
-            //actualizar
+            /*
+            actualizar campos de energía. Del comprador se resta la cantidad
+            de energía que fue satisfecha de su orden y del vendedor lógicamente
+            lo que logro vender
+            */
             ordenCompra.kwh -= energia;
             ordenVenta.kwh -= energia;
             
-            std::vector<TransaccionEnergia> transacciones;
+            //crear objeto TransaccionEnergia
+            TransaccionEnergia transaccion;
+
+            //tomar tiempo actual (sistema operativo)
+            time t = std::chrono::system_clock::now(); 
 
             TransaccionEnergia transaccion = {
                 ordenVenta.idNodo,
                 ordenCompra.idNodo,
                 energia,
-                precio
+                precio,
+                t
             };
             
-            transacciones.push_back(transaccion);
+            this->transacciones.push_back(transaccion);
 
-            //acá iría la persistencia (llamada a CapaDatos)
+            /*
+            * acá iría la persistencia (llamada a CapaDatos)
+            *
+            * 
+            * 
+            * 
+            */
 
+            //imprimir transacción, hasta acá ya fue completada
             transaccion.imprimirLog();
+
 
             double umbral = 0.001;
             if(ordenCompra.kwh > umbral)
