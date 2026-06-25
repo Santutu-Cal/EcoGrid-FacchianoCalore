@@ -29,7 +29,7 @@ private:
     Orden parsearLinea(const std::string& linea);
 
 public:
-    std::vector<Orden> leerOrdenes(const std::string& nombreArchivo);  
+    std::vector<Orden> leerOrdenes(const std::string& pathArchivo);  
 };
 
 /*
@@ -87,9 +87,9 @@ Convertir cada línea en un objeto Orden.
 Guardar cada Orden en un vector.
 Devolver el vector.
 */
-std::vector<Orden> LectorCSV::leerOrdenes(const std::string& nombreArchivo)
+std::vector<Orden> LectorCSV::leerOrdenes(const std::string& pathArchivo)
 {
-    std::ifstream archivo(nombreArchivo);
+    std::ifstream archivo((const std::string&)pathArchivo);
     if(!archivo.is_open())
         throw std::runtime_error("\n¡No se pudo abrir el archivo!");    
 

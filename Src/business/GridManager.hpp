@@ -15,23 +15,22 @@ typedef std::map<double, std::queue<Orden>> aMap;
 class GridManager
 {
 private:
-    std::vector<Orden> ordenes;
     std::vector<TransaccionEnergia> transacciones;
     bMap bidMap; 
     aMap askMap; 
 
+    void cargarLibroDeOrdenes(std::vector<Orden> ordenes);
 public:
-    void cargarLibroDeOrdenes();
-    void procesarTick();
+    void procesarTick(std::vector<Orden> ordenes);
     /*
     en la praćtica procesarTick le pasará como argumento el nombre del archivo a
     cargarLibroDeOrdenes.
     */
 };
 
-void GridManager::cargarLibroDeOrdenes()
+void GridManager::cargarLibroDeOrdenes(std::vector<Orden> ordenes)
 {
-    for(const auto& orden : this->ordenes)
+    for(const auto& orden : ordenes)
     {
         if(orden.esCompra)
         {
@@ -48,22 +47,28 @@ void GridManager::cargarLibroDeOrdenes()
 
 /*
 procesarTick:
-!) Tomár la mejor orden de compra y venta.
+1) Tomár la mejor orden de compra y venta.
 2) Generár la transacción (si hay matching).
 3) Actualizár los kWh remanentes.
 4) Eliminár las órdenes que quedaron completas.
 5) Si una cola de un determinado precio queda vacía, eliminar esa entrada.
 6) Volvér a evaluar la condición del while.
 */
-void GridManager::procesarTick()
+void GridManager::procesarTick(std::vector<Orden> ordenes)
 {
-    
     /*
     limpio las estructuras de datos para que no quede basura de anteriores 
-    ticks
+    ticks, cosa de que los siguientes procesamiento sean limpios
     */
     this->bidMap.clear();
     this->askMap.clear();
+
+    /*
+    Consulta a la bdd para meter al nodoBateria en askMap()
+    (CapaDatos)
+    */
+
+    cargarLibroDeOrdenes(ordenes);
 
     while(!this->bidMap.empty() && !this->askMap.empty())
     {
@@ -114,7 +119,7 @@ void GridManager::procesarTick()
             this->transacciones.push_back(transaccion);
 
             /*
-            * acá iría la persistencia (llamada a CapaDatos)
+            * acá iría la persistencia (CapaDatos)
             *
             * 
             * 
@@ -123,7 +128,6 @@ void GridManager::procesarTick()
 
             //imprimir transacción, hasta acá ya fue completada
             transaccion.imprimirLog();
-
 
             double umbral = 0.001;
             if(ordenCompra.kwh > umbral)

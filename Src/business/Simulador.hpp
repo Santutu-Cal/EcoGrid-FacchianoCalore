@@ -8,6 +8,7 @@
 namespace fs = std::filesystem;
 
 #include <vector>
+#include <algorithm>
 
 class Simulador
 {
@@ -15,31 +16,58 @@ private:
     GridManager grid;
     LectorCSV lector;
     
-    std::vector<fs::path> archivos;
-    void encuentraArchivosCSV();
+    std::vector<fs::path> obtenerArchivosCSV();
 
 public:
     void ejecutar();    
 };
 
-void Simulador::encuentraArchivosCSV()
+std::vector<fs::path> Simulador::obtenerArchivosCSV()
 {
+    /*
+    "fs::path" es un objeto que representa la ruta en donde se almacenan los 
+    archivos que se van a utilizar en el código. Además ofrece herramientas
+    cómodas para trabajar con rutas de archivos.
+    */
     fs::path carpeta = "Data";
     
+    std::vector<fs::path> archivos;
+
+    /*
+    "fs::directory_iterator" lo que hace es literalmente establecer un iterador
+    dentro de la carpeta, recorriendo todos los elementos que tiene la misma de 
+    forma secuencial. En este caso se quiere filtrar los archivos que tengan
+    extension ".csv", por lo tanto en el vector se irán guardando las rutas de
+    los archivos
+    */
     for(const auto& entrada : fs::directory_iterator(carpeta))
     {
         if(entrada.path().extension() == ".csv")
         {
-            this->archivos.push_back(entrada.path());
+            archivos.push_back(entrada.path());
         }        
     }
 
-    std::sort(this->archivos.begin(), this->archivos.end());
+    //por las dudas los ordena de menor a mayor (no es una operación cara)
+    std::sort(archivos.begin(), archivos.end());
+
+    return archivos;
 }
 
 void Simulador::ejecutar()
 {
     LectorCSV lector;
+    GridManager grid;
+
+    auto archivos = obtenerArchivosCSV();
+
+    for(const auto& archivo : archivos)
+    {
+        //se obtienen las ordenes del archivo
+        auto ordenes = lector.leerOrdenes(archivo);
+
+        grid.procesarTick(ordenes);
+    }
 }
 
 #endif
