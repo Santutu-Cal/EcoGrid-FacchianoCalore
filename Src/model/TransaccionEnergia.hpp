@@ -19,7 +19,7 @@ typedef struct TransaccionEnergia
         idVendedor{idV}, idComprador{idC}, kwh{k}, precio{p}, timestamp{t} {}
     */
     
-    void imprimirLog() const
+    void log() const
     {
         auto tiempo =
             std::chrono::system_clock::to_time_t(this->timestamp);

@@ -9,6 +9,9 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 #define CANT_COLUMNAS 5
 
@@ -20,7 +23,7 @@ bool stob(std::string string)
     {
         c = tolower(c);
     }
-    return (string == "true" || string == "1");
+    return (string == "compra" || string == "1");
 }
 
 class LectorCSV
@@ -29,7 +32,7 @@ private:
     Orden parsearLinea(const std::string& linea);
 
 public:
-    std::vector<Orden> leerOrdenes(const std::string& pathArchivo);  
+    std::vector<Orden> leerOrdenes(const fs::path& pathArchivo);  
 };
 
 /*
@@ -87,9 +90,10 @@ Convertir cada línea en un objeto Orden.
 Guardar cada Orden en un vector.
 Devolver el vector.
 */
-std::vector<Orden> LectorCSV::leerOrdenes(const std::string& pathArchivo)
+std::vector<Orden> LectorCSV::leerOrdenes(const fs::path& pathArchivo)
 {
-    std::ifstream archivo((const std::string&)pathArchivo);
+    std::ifstream archivo(pathArchivo);
+
     if(!archivo.is_open())
         throw std::runtime_error("\n¡No se pudo abrir el archivo!");    
 

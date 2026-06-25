@@ -126,8 +126,8 @@ void GridManager::procesarTick(std::vector<Orden> ordenes)
             * 
             */
 
-            //imprimir transacción, hasta acá ya fue completada
-            transaccion.imprimirLog();
+            //imprimir transacción
+            transaccion.log();
 
             double umbral = 0.001;
             if(ordenCompra.kwh > umbral)

@@ -3,9 +3,12 @@
 
 #include "Simulador.hpp"
 
+/*
+*/
 int main(void)
 {
-
+    Simulador s;
+    s.ejecutar();
 
     return 0;
 }

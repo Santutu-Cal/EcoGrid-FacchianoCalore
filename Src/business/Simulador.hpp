@@ -59,12 +59,14 @@ void Simulador::ejecutar()
     LectorCSV lector;
     GridManager grid;
 
+    //archivos es un vector que contiene todos los path a los archivos ".csv"
     auto archivos = obtenerArchivosCSV();
 
-    for(const auto& archivo : archivos)
+    //ahora se recorrería
+    for(const auto& pathArchivo : archivos)
     {
         //se obtienen las ordenes del archivo
-        auto ordenes = lector.leerOrdenes(archivo);
+        auto ordenes = lector.leerOrdenes(pathArchivo);
 
         grid.procesarTick(ordenes);
     }
