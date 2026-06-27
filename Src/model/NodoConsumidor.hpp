@@ -9,21 +9,10 @@ class NodoConsumidor : public NodoRed
 {
 private:
     PerfilConsumo perfil;
+    double consumo;
 
 public:
-    double calcularExcedente() override
-    {
-        switch(perfil)
-        {
-            //acá puse valores de ejemplo, se podrían poner valores mas acordes
-            case Residencial: 
-                return -5.0;
-            case Comercial:
-                return -20.0;
-            case Industrial:
-                return -50.0;          
-        }
-    }   
+    double calcularExcedente() override;
 };
 
 #endif

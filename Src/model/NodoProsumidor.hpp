@@ -6,16 +6,13 @@
 class NodoProsumidor : public NodoRed 
 {
 private:
-    //Modelado ficticio
+    //modelado ficticio
     double produccion;  
     double consumo;    
     
 public:
-    //El resultado de la resta será positivo si hay excedente
-    double calcularExcedente() override
-    {
-        return produccion - consumo;
-    }
+    //el resultado de la resta será positivo si hay excedente
+    double calcularExcedente() override;
 };
 
 #endif
