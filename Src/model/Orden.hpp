@@ -8,8 +8,8 @@ typedef struct Orden
     int idOrden;
     bool esCompra;
     int idNodo;
-    double precio;
     double kwh;
+    double precio;
 
     /*
     "unsigned integer 64 bits", el uso simplemente se limita a "tengo un numero

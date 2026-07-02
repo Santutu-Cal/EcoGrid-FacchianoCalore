@@ -19,14 +19,14 @@ private:
     bMap bidMap; 
     aMap askMap; 
 
-    void cargarLibroDeOrdenes(std::vector<Orden> ordenes);
+    void cargarLibroDeOrdenes(const std::vector<Orden>& ordenes);
     
 public:
     /*
     en la praćtica procesarTick le pasará como argumento el nombre del archivo a
     cargarLibroDeOrdenes.
     */
-    void procesarTick(std::vector<Orden> ordenes);
+    void procesarTick(const std::vector<Orden>& ordenes);
 };
 
 #endif

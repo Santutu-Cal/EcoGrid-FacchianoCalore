@@ -45,16 +45,16 @@ Orden LectorCSV::parsearLinea(const std::string& linea)
             if(i==1) idOrden = std::stoi(campo);
             if(i==2) esCompra = esCompraFunct(campo);
             if(i==3) idNodo = std::stoi(campo);
-            if(i==4) precio = std::stod(campo);
-            if(i==5) kwh = std::stod(campo);
+            if(i==4) kwh = std::stod(campo);
+            if(i==5) precio = std::stod(campo);
         }
         
         Orden ord = {
             idOrden, 
             esCompra, 
             idNodo, 
-            precio, 
-            kwh
+            kwh, 
+            precio
         };
 
         return ord;
@@ -84,15 +84,15 @@ std::vector<Orden> LectorCSV::leerOrdenes(const std::string& archivoCSV)
     */
     if(!archivo.is_open())
     {
+        std::cout << "Desde LectorCSV.cpp\n" << std::endl; 
         throw 
-        std::runtime_error("\n*** No se pudo abrir el archivo: " + archivoCSV);    
+        std::runtime_error("No se pudo abrir el archivo: " + archivoCSV);    
     }
 
     //vector que contendrá todas las ordenes a procesar
     std::vector<Orden> ordenes;
 
     std::string linea;
-    
     //consumir primer línea (la que tiene datos cabecera de las columnas)
     std::getline(archivo, linea);
 
