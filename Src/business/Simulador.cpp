@@ -1,6 +1,3 @@
-#ifndef SIMULADOR_CPP
-#define SIMULADOR_CPP
-
 #include "Simulador.hpp"
 
 void Simulador::ejecutar()
@@ -20,5 +17,3 @@ void Simulador::ejecutar()
         grid.procesarTick(ordenes);
     }
 }
-
-#endif

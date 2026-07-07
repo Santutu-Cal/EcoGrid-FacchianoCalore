@@ -1,6 +1,3 @@
-#ifndef NODOPROSUMIDOR_CPP
-#define NODOPROSUMIDOR_CPP
-
 #include "NodoProsumidor.hpp"
 
 double NodoProsumidor::calcularExcedente()
@@ -11,5 +8,3 @@ double NodoProsumidor::calcularExcedente()
 /*
 setter/getters y métodos que faltan
 */
-
-#endif

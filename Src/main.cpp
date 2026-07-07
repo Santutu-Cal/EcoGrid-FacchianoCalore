@@ -1,6 +1,3 @@
-#ifndef MAIN_CPP
-#define MAIN_CPP
-
 #include "Simulador.hpp"
 
 //usar para hacer el log de la ubicacion del directorio
@@ -8,6 +5,7 @@
 
 int main(void)
 {
+
     /*
     esta linea es para depurar, (muestra el directorio desde el que se está
     ejecutando el programa)
@@ -16,10 +14,15 @@ int main(void)
     << std::filesystem::current_path()
     << std::endl;
 
+    //pruebas iniciales con CapaDatos
+    CapaDatos cd;
+    cd.conectar();
+
+    /*
     Simulador s;
     s.ejecutar();
+    */
+
 
     return 0;
 }
-
-#endif

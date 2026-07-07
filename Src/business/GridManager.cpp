@@ -1,6 +1,3 @@
-#ifndef GRIDMANAGER_CPP
-#define GRIDMANAGER_CPP
-
 #include "GridManager.hpp"
 
 void GridManager::cargarLibroDeOrdenes(const std::vector<Orden> &ordenes)
@@ -162,5 +159,3 @@ void GridManager::procesarTick(const std::vector<Orden> &ordenes)
     carguen los créditos de sus nodos correspondientes a ese precio base.
     */
 }
-
-#endif

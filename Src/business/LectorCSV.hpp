@@ -10,7 +10,7 @@
 #include <iostream>
 #include <algorithm>
 
-#define CANT_COLUMNAS 5
+#define CANT_CAMPOS 5
 
 class LectorCSV
 {    

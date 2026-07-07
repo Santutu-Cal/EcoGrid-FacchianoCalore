@@ -1,6 +1,3 @@
-#ifndef TRANSACCIONENERGIA_CPP
-#define TRANSACCIONENERGIA_CPP
-
 #include "TransaccionEnergia.hpp"
 
 void TransaccionEnergia::log() const
@@ -14,6 +11,4 @@ void TransaccionEnergia::log() const
     << "\n-idComprador: " << this->idComprador << "\n-" << this->kwh 
     << " kWh vendidos a " << this->precio << " créditos.\n" 
     << "-Horario de transacción: " << std::ctime(&tiempo) << std::endl;
-}    
-
-#endif 
+}

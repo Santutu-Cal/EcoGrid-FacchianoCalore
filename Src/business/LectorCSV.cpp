@@ -1,6 +1,3 @@
-#ifndef LECTORCSV_CPP
-#define LECTORCSV_CPP
-
 #include "Simulador.hpp"
 
 //función que parsea de string a bool
@@ -37,7 +34,7 @@ Orden LectorCSV::parsearLinea(const std::string& linea)
         double kwh, precio;
         bool esCompra;
 
-        for(int i=1; i<=CANT_COLUMNAS; i++)
+        for(int i=1; i<=CANT_CAMPOS; i++)
         {
             std::string campo;
             std::getline(ss, campo, ',');
@@ -86,7 +83,7 @@ std::vector<Orden> LectorCSV::leerOrdenes(const std::string& archivoCSV)
     {
         std::cout << "Desde LectorCSV.cpp\n" << std::endl; 
         throw 
-        std::runtime_error("No se pudo abrir el archivo: " + archivoCSV);    
+        std::runtime_error("*No se pudo abrir el archivo: " + archivoCSV);    
     }
 
     //vector que contendrá todas las ordenes a procesar
@@ -105,5 +102,3 @@ std::vector<Orden> LectorCSV::leerOrdenes(const std::string& archivoCSV)
 
     return ordenes;
 }
-
-#endif

@@ -1,6 +1,3 @@
-#ifndef NODORED_CPP
-#define NODORED_CPP
-
 #include "NodoRed.hpp"
 
 #include <stdexcept>
@@ -25,5 +22,3 @@ double NodoRed::getSaldoCuenta() const
 {
     return saldoCuenta;
 }
-
-#endif

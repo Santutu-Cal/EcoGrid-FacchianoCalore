@@ -3,6 +3,7 @@
 
 #include "GridManager.hpp"
 #include "LectorCSV.hpp"
+#include "CapaDatos.hpp"
 
 #include <vector>
 #include <algorithm>
