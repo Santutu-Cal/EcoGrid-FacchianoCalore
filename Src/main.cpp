@@ -14,9 +14,15 @@ int main(void)
     << std::filesystem::current_path()
     << std::endl;
 
-    //pruebas iniciales con CapaDatos
+    /*
+    //pruebas iniciales con la conexion a la bdd
     CapaDatos cd;
     cd.conectar();
+    cd.insert();
+    cd.select();
+    cd.update();
+    cd.mostrarTabla();
+    */
 
     /*
     Simulador s;

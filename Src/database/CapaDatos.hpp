@@ -34,8 +34,11 @@ public:
     void obtenerSesion();
     
     //
-    void consulta();
+    void insert();
+    void select();
     void update();
+    void myDelete();
+    void mostrarTabla();
 };
 
 #endif

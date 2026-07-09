@@ -13,13 +13,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # encuentra las dependencias para la bdd
 find_package(PostgreSQL REQUIRED)
-find_package(SOCI REQUIRED)
 
-# ubicacion de los ".hpps" que deberá encontrar para compilar
-include_directories(
-    Src/business
-    Src/model
-    Src/database
+# encuentran las librerías para linkear los ejecutables sin errores
+
+find_path(SOCI_INCLUDE_DIR
+    NAMES soci/soci.h
+)
+
+find_library(SOCI_CORE_LIBRARY
+    NAMES soci_core
+)
+
+find_library(SOCI_POSTGRESQL_LIBRARY
+    NAMES soci_postgresql
 )
 
 # crea el ejetuable nombrando cada uno de los archivos ".cpp" del proyecto
@@ -39,6 +45,18 @@ add_executable(EcoGrid
     Src/database/CapaDatos.cpp
     Src/database/ConfigReader.cpp
 )
+
+# ubicacion de los ".hpps" que deberá encontrar para compilar
+target_include_directories(EcoGrid PRIVATE
+    Src/business
+    Src/model
+    Src/database
+    ${SOCI_INCLUDE_DIR}
+    ${PostgreSQL_INCLUDE_DIRS}
+)
+
+
+# agrega warnings a la compilacion
 
 # -Wall: advertencias, más comunes y útiles para errores típicos, como varia- 
 # -bles sin usar, funciones obsoletas o pérdida de tipos.
@@ -61,8 +79,7 @@ target_compile_options(EcoGrid PRIVATE
 # enlazar (link) las librerías
 target_link_libraries(EcoGrid
     PRIVATE
-        soci_core
-        soci_postgresql
+        ${SOCI_CORE_LIBRARY}
+        ${SOCI_POSTGRESQL_LIBRARY}
+        ${PostgreSQL_LIBRARIES}
 )
-
-# agrega warnings a la compilacion
