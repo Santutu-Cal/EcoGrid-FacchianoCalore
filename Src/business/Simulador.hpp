@@ -3,7 +3,10 @@
 
 #include "GridManager.hpp"
 #include "LectorCSV.hpp"
+
 #include "CapaDatos.hpp"
+
+#include "NodoRed.hpp"
 
 #include <vector>
 #include <algorithm>
@@ -13,7 +16,10 @@ class Simulador
 private:
     GridManager grid;
     LectorCSV lector;
-    
+    CapaDatos cp;
+
+    std::vector<std::unique_ptr<NodoRed>> nodos;
+
     const std::vector<std::string> archivos{
         "Datos/ofertas_00.csv",
         "Datos/ofertas_10.csv",

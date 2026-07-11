@@ -12,6 +12,7 @@ private:
     double consumo;
 
 public:
+    
     double calcularExcedente() override;
 };
 

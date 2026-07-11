@@ -26,7 +26,8 @@ public:
     en la praćtica procesarTick le pasará como argumento el nombre del archivo a
     cargarLibroDeOrdenes.
     */
-    void procesarTick(const std::vector<Orden>& ordenes);
+    void procesarTick
+    (const std::vector<Orden>& ordenes, const std::string hora);
 };
 
 #endif

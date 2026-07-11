@@ -3,11 +3,13 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 
 #include <soci/soci.h> //include principal de SOCI
 #include <soci/postgresql/soci-postgresql.h> //cargar backend de PostgreSQL
 
-//probablemente no se use acá
+#include "NodoRed.hpp"
+
 #include "TransaccionEnergia.hpp"
 
 #include "ConfigReader.hpp"
@@ -19,6 +21,7 @@ private:
     std::string conexion;
     ConfigReader cr;
 
+    //objeto que sostiene la conexion con la bdd
     soci::session sql;
 
 public:
@@ -27,13 +30,24 @@ public:
     void cargarNodos();
 
 
-    //prueba de bdd (no influye en el tema central del tp)
-    //probar que la clase pueda mínimamente una conexion con la bdd
+
+    //establecer conexion
     void conectar();
-    void desconectar(); //opcional
-    void obtenerSesion();
+
+    //cancelar conexion
+    void desconectar();
     
-    //
+    //informacion de la conexion
+    void obtenerSesion();
+
+    //consulta nodos (los obtiene) de la bdd
+    std::vector<std::unique_ptr<NodoRed>> obtenerNodos();
+    
+    //persistir transacciones hechas en un tick
+    void CapaDatos::persistirTransacciones
+        (const std::vector<TransaccionEnergia>& transacciones);
+
+    //prueba de bdd (no influye en la entrega del tp)
     void insert();
     void select();
     void update();

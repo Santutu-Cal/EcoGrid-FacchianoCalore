@@ -26,7 +26,8 @@ procesarTick:
 5) Si una cola de un determinado precio queda vacía, eliminar esa entrada.
 6) Volvér a evaluar la condición del while.
 */
-void GridManager::procesarTick(const std::vector<Orden> &ordenes)
+void GridManager::procesarTick
+(const std::vector<Orden> &ordenes, const std::string hora)
 {
     /*
     limpio las estructuras de datos para que no quede basura de anteriores 

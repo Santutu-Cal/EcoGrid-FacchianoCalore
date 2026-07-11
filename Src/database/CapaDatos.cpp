@@ -1,25 +1,6 @@
 #include "CapaDatos.hpp"
 
 //funciones de prueba
-void CapaDatos::conectar()
-{
-    try
-    {
-
-        //obtiene las credenciales del archivo config.ini
-        this->conexion = this->cr.leerConfig("Src/database/config.ini");
-
-        //abre la conexion a la bdd
-        this->sql.open( soci::postgresql, this->conexion);
-
-        std::cout << "\n¡Conexion exitosa a la bdd!" << std::endl;
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << "\nDesde CapaDatos::conectar\n *Error de conexion: " 
-            << e.what() << std::endl;
-    }
-}
 
 //into trae datos SQL a C++
 void CapaDatos::insert()
@@ -88,4 +69,55 @@ void CapaDatos::mostrarTabla()
 
 
 //acá empiezan las funciones que van en el TP realmente
+void CapaDatos::conectar()
+{
+    try
+    {
+        //obtiene las credenciales del archivo config.ini
+        this->conexion = this->cr.leerConfig("Src/database/config.ini");
+
+        //abre la conexion a la bdd
+        this->sql.open( soci::postgresql, this->conexion);
+
+        std::cout << "\n¡Conexion exitosa a la bdd!" << std::endl;
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << "\nDesde CapaDatos::conectar\n *Error de conexion: " 
+            << e.what() << std::endl;
+    }
+}
+
+std::vector<std::unique_ptr<NodoRed>> CapaDatos::obtenerNodos()
+{
+    std::vector<std::unique_ptr<NodoRed>> nodos;
+
+    //contiene todos los nodos que están en la tabla "nodos" en la bdd
+    soci::rowset<soci::row> filas = 
+        (this->sql.prepare << "SELECT * FROM nodos");
+
+    for(soci::row& fila : filas)
+    {
+        std::string tipo = fila.get<std::string>("tipo");
+        if(tipo=="consumidor")
+        {
+            //ejecutar constructor de NodoConsumidor
+        }
+        else if(tipo=="prosumidor")
+        {
+            //ejecutar constructor de NodoProsumidor
+        }
+        else
+        {
+            //ejecutar constructor de NodoAlmacenamiento
+        }
+    }    
+    return nodos;
+}
+
+void CapaDatos::persistirTransacciones
+    (const std::vector<TransaccionEnergia>& transacciones)
+{
+
+}
 

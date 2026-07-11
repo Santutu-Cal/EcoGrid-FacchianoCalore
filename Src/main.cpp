@@ -24,10 +24,9 @@ int main(void)
     cd.mostrarTabla();
     */
 
-    /*
+    //empieza el programa
     Simulador s;
     s.ejecutar();
-    */
 
 
     return 0;
