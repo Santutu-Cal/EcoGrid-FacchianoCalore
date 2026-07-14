@@ -6,13 +6,25 @@
 class NodoProsumidor : public NodoRed 
 {
 private:
-    //modelado ficticio
-    double produccion;  
-    double consumo;    
+    //modelado
+    double produccionActual;  
+    double consumoActual;    
     
 public:
+    //constructor
+    NodoProsumidor(int id,
+    double balanceEnergia, double saldoCuenta);
+
+    //getters
+    double getConsumoActual() const;
+    double getProduccionActual() const;
+
+    //registros de lecturas (Guardan las lecturas del tick actual)
+    void registrarConsumo(double consumo);
+    void registrarProduccion(double produccion);
+
     //el resultado de la resta será positivo si hay excedente
-    double calcularExcedente() override;
+    double calcularExcedente() const override;
 };
 
 #endif
