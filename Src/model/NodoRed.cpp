@@ -2,16 +2,15 @@
 
 #include <stdexcept>
 
+//Constructor
+NodoRed::NodoRed(int id, double balanceEnergia, double saldoCuenta):id(id), 
+balanceEnergia(balanceEnergia), saldoCuenta(saldoCuenta){} 
 //getters
 int NodoRed::getId() const
 {
     return id;
 }
 
-std::string NodoRed::getUbicacion() const
-{
-    return ubicacion;
-}
 
 double NodoRed::getBalanceEnergia() const
 {
