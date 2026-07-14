@@ -21,7 +21,7 @@ public:
     double getBalanceEnergia() const;
     double getSaldoCuenta() const;
 
-    virtual double calcularExcedente() = 0;
+    virtual double calcularExcedente() const = 0;
 };
 
 #endif
