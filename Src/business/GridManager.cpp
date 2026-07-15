@@ -19,12 +19,13 @@ void GridManager::cargarLibroDeOrdenes(const std::vector<Orden> &ordenes)
 
 /*
 procesarTick:
-1) Tomár la mejor orden de compra y venta.
-2) Generár la transacción (si hay matching).
-3) Actualizár los kWh remanentes.
-4) Eliminár las órdenes que quedaron completas.
-5) Si una cola de un determinado precio queda vacía, eliminar esa entrada.
-6) Volvér a evaluar la condición del while.
+1) Refrescar las estructuras de datos
+2) Tomár la mejor orden de compra y venta.
+3) Generár la transacción (si hay matching).
+4) Actualizár los kWh remanentes.
+5) Eliminár las órdenes que quedaron completas.
+6) Si una cola de un determinado precio queda vacía, eliminar esa entrada.
+7) Volvér a evaluar la condición del while.
 */
 void GridManager::procesarTick
 (NodoAlmacenamiento bateria, const std::vector<Orden> &ordenes, 
@@ -37,20 +38,34 @@ void GridManager::procesarTick
     this->bidMap.clear();
     this->askMap.clear();
 
-    /*
-    Consulta a la bdd para meter al nodoBateria en askMap. Debería hacer una
-    consulta SQL mediante CapaDatos
-    */
-
     //carga bidMap y askMap de ordenes correspondientes a cada uno
     cargarLibroDeOrdenes(ordenes);
+
+    /*
+    si la cantidad de kwh de la bateria es mayor a 0 podrá ofertarlos en el 
+    matching, por lo tanto se debe añadir al libro de ordenes
+    */
+    if(bateria.getBalanceEnergia() > 0)
+    {
+        //crea un struct Orden para poder almacenarlo en el libro de ordenes
+        Orden orden_bateria(
+            this->id_orden_bateria--,
+            false,
+            bateria.getId(),
+            bateria.getBalanceEnergia(),
+            CapaDatos.obtenerPrecioBase()
+        );
+        
+        //carga la oferta de la bateria en bidMap
+        this->askMap[orden_bateria.precio].push(orden_bateria);
+    }
 
     //mientras los dos mapas contengan ordenes
     while(!this->bidMap.empty() && !this->askMap.empty())
     {
         /*
         toma de bidMap la mejor oferta de compra y toma la mejor oferta de 
-        venta de askMap 
+        venta de askMap (ordenes)
         */
         auto mejorBid = this->bidMap.begin();
         auto mejorAsk = this->askMap.begin();
@@ -90,9 +105,6 @@ void GridManager::procesarTick
             */
             ordenCompra.kwh -= energia;
             ordenVenta.kwh -= energia;
-            
-            //tomar tiempo actual (sistema operativo)
-            Timestamp t = std::chrono::system_clock::now(); 
 
             //crear e inicializar objeto TransaccionEnergia
             TransaccionEnergia transaccion = {
@@ -100,22 +112,11 @@ void GridManager::procesarTick
                 ordenCompra.idNodo,
                 energia,
                 precio,
-                t
+                hora + ":00"
             };
             
             //añadir al vector de transaccioes del objeto la transaccion hecha
             this->transacciones.push_back(transaccion);
-
-            /*
-            acá iría la persistencia (CapaDatos)
-            Habría que actualizar los creditos y kwh que tienen los nodos y
-            registrar la transaccion en la tabla transacciones.
-            *
-            *
-            * 
-            * 
-            * 
-            */
 
             //imprimir informacion de transacción
             transaccion.log();
@@ -159,5 +160,9 @@ void GridManager::procesarTick
     todavía puede aparecer un comprador que consuma esa energía. También se
     debería consultar el precio base horario para que las ofertas con excedentes
     carguen los créditos de sus nodos correspondientes a ese precio base.
+    */
+
+    /*
+    ya por último iría la persistencia de las transacciones en la bdd
     */
 }

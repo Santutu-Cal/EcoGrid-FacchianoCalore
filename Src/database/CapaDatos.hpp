@@ -35,7 +35,7 @@ public:
     std::vector<std::unique_ptr<NodoRed>> obtenerNodos();
     
     //obtener precio base correspondiente
-    double obtenerPrecioBase();
+    double obtenerPrecioBase(const std::string hora) const;
 
     //establecer conexion
     void conectar();

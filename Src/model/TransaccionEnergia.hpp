@@ -4,15 +4,13 @@
 #include <chrono>
 #include <iostream>
 
-typedef std::chrono::system_clock::time_point Timestamp;
-
 typedef struct TransaccionEnergia
 {
     int idVendedor;
     int idComprador;
     double kwh;
     double precio;
-    Timestamp timestamp;
+    std::string hora;
 
     /*
     TransaccionEnergia(int idV, int idC, double k, double p, time t) :

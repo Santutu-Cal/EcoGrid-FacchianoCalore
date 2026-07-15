@@ -7,6 +7,8 @@
 #include "TransaccionEnergia.hpp"
 #include "NodoAlmacenamiento.hpp"
 
+#include "CapaDatos.hpp"
+
 #include <map>
 #include <queue>
 #include <vector>
@@ -22,11 +24,15 @@ private:
     aMap askMap; 
 
     void cargarLibroDeOrdenes(const std::vector<Orden>& ordenes);
-    
+
+    //id apropiado para ofertas de venta de la bateria
+    int id_orden_bateria;
+
 public:
     /*
     en la praćtica procesarTick le pasará como argumento el nombre del archivo a
-    cargarLibroDeOrdenes.
+    cargarLibroDeOrdenes. La batería una vez fue cargada desde la bdd, siempre 
+    trabajará en RAM
     */
     void procesarTick
     (NodoAlmacenamiento bateria, const std::vector<Orden> &ordenes, 

@@ -12,10 +12,13 @@ void Simulador::ejecutar()
 
     //instanciar la bateria (aún no inicializada con valores de la bdd)
     std::unique_ptr<NodoAlmacenamiento> bateria;
+    
+    //inicializar el id de las ordenes para la bateria (será decremental)
+    grid.id_orden_bateria = 0;
 
     for(const auto &nodo : this->nodos)
     {
-        //si es un NodoAlmacenamiento accede al scope del if
+        //si es NodoAlmacenamiento accede al scope del if
         if(auto bat : std::dynamic_pointer_cast<NodoAlmacenamiento>(nodo))
             //bateria con valores ya cargados, argumento para procesarTick()
             bateria = bat;

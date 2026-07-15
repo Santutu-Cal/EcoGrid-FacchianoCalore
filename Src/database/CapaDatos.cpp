@@ -135,9 +135,20 @@ std::vector<std::unique_ptr<NodoRed>> CapaDatos::obtenerNodos()
     return nodos;
 }
 
+double obtenerPrecioBase(const std::string hora) const
+{
+    //inicializo el contenedor del resultado de la consulta     
+    double precio_base = 0.0;
+    this->sql << "SELECT precio_base FROM config_tarifas WHERE hora= :hora",
+        soci::use(hora), soci::into(precio_base);
+    std::cout << "\n¡Consulta de precio base hecha con éxito!";
+
+    return precio_base;
+}
+
 void CapaDatos::persistirTransacciones
     (const std::vector<TransaccionEnergia>& transacciones)
 {
-
+    
 }
 
