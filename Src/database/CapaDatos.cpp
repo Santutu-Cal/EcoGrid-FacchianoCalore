@@ -68,6 +68,7 @@ void CapaDatos::mostrarTabla()
 }
 
 
+//-----------------------------------------------------
 //acá empiezan las funciones que van en el TP realmente
 void CapaDatos::conectar()
 {
@@ -101,15 +102,34 @@ std::vector<std::unique_ptr<NodoRed>> CapaDatos::obtenerNodos()
         std::string tipo = fila.get<std::string>("tipo");
         if(tipo=="consumidor")
         {
-            //ejecutar constructor de NodoConsumidor
+            nodos.push_back(
+                std::make_unique<NodoConsumidor>(
+                    fila.get<int>("id"),
+                    0,
+                    fila.get<double>("saldo_cuenta"),
+                    perfil
+                )
+            );
         }
         else if(tipo=="prosumidor")
         {
-            //ejecutar constructor de NodoProsumidor
+            nodos.push_back(
+                std::make_unique<NodoProsumidor>(
+                    fila.get<int>("id"),
+                    0,
+                    saldoCuenta.fila.get<double>("saldo_cuenta")
+                )
+            );
         }
         else
         {
-            //ejecutar constructor de NodoAlmacenamiento
+            nodos.push_back(
+                std::make_unique<NodoAlmacenamiento>(
+                fila.get<int>("id"),
+                0,
+                fila.get<double>("saldo_cuenta")
+                )
+            );
         }
     }    
     return nodos;

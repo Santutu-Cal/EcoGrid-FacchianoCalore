@@ -7,6 +7,7 @@
 #include "CapaDatos.hpp"
 
 #include "NodoRed.hpp"
+#include "NodoAlmacenamiento.hpp"
 
 #include <vector>
 #include <algorithm>

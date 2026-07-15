@@ -2,8 +2,10 @@
 #define GRIDMANAGER_HPP
 
 #include "LectorCSV.hpp"
+
 #include "Orden.hpp"
 #include "TransaccionEnergia.hpp"
+#include "NodoAlmacenamiento.hpp"
 
 #include <map>
 #include <queue>
@@ -27,7 +29,8 @@ public:
     cargarLibroDeOrdenes.
     */
     void procesarTick
-    (const std::vector<Orden>& ordenes, const std::string hora);
+    (NodoAlmacenamiento bateria, const std::vector<Orden> &ordenes, 
+        const std::string hora);
 };
 
 #endif

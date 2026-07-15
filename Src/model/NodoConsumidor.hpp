@@ -9,21 +9,17 @@ class NodoConsumidor : public NodoRed
 {
 private:
     PerfilConsumo perfil;
-    double consumoActual;
 
 public:
-    //constructor
     NodoConsumidor(int id, double balanceEnergia, double saldoCuenta,
     PerfilConsumo perfil);
-    //No creamos un destructor ya que con el que hereda de nodoRed es suficiente
+    //No creamos un destructor ya que con el que hereda de NodoRed es suficiente
 
-    //getters
-    double getConsumoActual();
+    //get propio del consumidor para el perfil
     PerfilConsumo getPerfil();
-    //modificacion
-    void registrarConsumo(double consumo);
+
     //polimorfismo
-    double calcularExcedente() const override;
+    double calcularExcedente() override;
 };
 
 #endif

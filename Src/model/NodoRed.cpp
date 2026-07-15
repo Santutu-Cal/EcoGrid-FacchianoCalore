@@ -5,12 +5,12 @@
 //Constructor
 NodoRed::NodoRed(int id, double balanceEnergia, double saldoCuenta):id(id), 
 balanceEnergia(balanceEnergia), saldoCuenta(saldoCuenta){} 
+
 //getters
 int NodoRed::getId() const
 {
     return id;
 }
-
 
 double NodoRed::getBalanceEnergia() const
 {

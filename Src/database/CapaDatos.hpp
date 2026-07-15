@@ -9,6 +9,8 @@
 #include <soci/postgresql/soci-postgresql.h> //cargar backend de PostgreSQL
 
 #include "NodoRed.hpp"
+#include "NodoConsumidor.hpp"
+#include "NodoProsumidor.hpp"
 
 #include "TransaccionEnergia.hpp"
 
@@ -25,11 +27,15 @@ private:
     soci::session sql;
 
 public:
-    void persistirTransacciones();
-    void obtenerPrecioBase();
-    void cargarNodos();
-
-
+    //persistir transacciones hechas en un tick
+    void CapaDatos::persistirTransacciones
+        (const std::vector<TransaccionEnergia>& transacciones);
+    
+    //consultar nodos (los obtiene) de la bdd
+    std::vector<std::unique_ptr<NodoRed>> obtenerNodos();
+    
+    //obtener precio base correspondiente
+    double obtenerPrecioBase();
 
     //establecer conexion
     void conectar();
@@ -40,19 +46,14 @@ public:
     //informacion de la conexion
     void obtenerSesion();
 
-    //consulta nodos (los obtiene) de la bdd
-    std::vector<std::unique_ptr<NodoRed>> obtenerNodos();
-    
-    //persistir transacciones hechas en un tick
-    void CapaDatos::persistirTransacciones
-        (const std::vector<TransaccionEnergia>& transacciones);
-
+    //-----------------------------------------------
     //prueba de bdd (no influye en la entrega del tp)
     void insert();
     void select();
     void update();
     void myDelete();
     void mostrarTabla();
+    //------------------------------------------------
 };
 
 #endif

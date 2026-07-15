@@ -27,7 +27,8 @@ procesarTick:
 6) Volvér a evaluar la condición del while.
 */
 void GridManager::procesarTick
-(const std::vector<Orden> &ordenes, const std::string hora)
+(NodoAlmacenamiento bateria, const std::vector<Orden> &ordenes, 
+    const std::string hora)
 {
     /*
     limpio las estructuras de datos para que no quede basura de anteriores 

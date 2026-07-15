@@ -3,26 +3,13 @@
 
 #include "NodoRed.hpp"
 
-class NodoAlmacenamiento : public NodoRed {
-    double cargaActual;
-    double capacidad;
-
+class NodoAlmacenamiento : public NodoRed 
+{
 public:
-    //Constructor
-    NodoAlmacenamiento(int id,
-    double balanceEnergia, double saldoCuenta,
-    double cargaActual, double capacidad);
-
-    //Getters
-    double getCargaActual() const;
-    double getCapacidad() const;
-
-    //Funcionalidad de la bateria
-    void absorber(double energia);
-    void ofrecer(double energia);
+    NodoAlmacenamiento(int id, double balanceEnergia, double saldoCuenta);
 
     //Polimorfismo
-    double calcularExcedente() const override;
+    double calcularExcedente() override;
 };
 
 #endif

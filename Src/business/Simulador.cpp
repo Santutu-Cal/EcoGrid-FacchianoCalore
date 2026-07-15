@@ -10,6 +10,17 @@ void Simulador::ejecutar()
     cp.conectar();
     this->nodos = cp.obtenerNodos();
 
+    //instanciar la bateria (aún no inicializada con valores de la bdd)
+    std::unique_ptr<NodoAlmacenamiento> bateria;
+
+    for(const auto &nodo : this->nodos)
+    {
+        //si es un NodoAlmacenamiento accede al scope del if
+        if(auto bat : std::dynamic_pointer_cast<NodoAlmacenamiento>(nodo))
+            //bateria con valores ya cargados, argumento para procesarTick()
+            bateria = bat;
+    }
+
     //acceder a archivos secuencialmente, leer las ordenes y procesarlas
     for(const auto& archivoCSV : this->archivos)
     {
@@ -23,6 +34,6 @@ void Simulador::ejecutar()
         auto ordenes = lector.leerOrdenes(archivoCSV);
         
         //procesa las ordenes obtenidas del archivo
-        grid.procesarTick(ordenes, hora);
+        grid.procesarTick(bateria, ordenes, hora);
     }
 }
