@@ -13,7 +13,10 @@ void Simulador::ejecutar()
     //instanciar la bateria (aún no inicializada con valores de la bdd)
     std::unique_ptr<NodoAlmacenamiento> bateria;
     
-    //inicializar el id de las ordenes para la bateria (será decremental)
+    /*
+    inicializar el id de las ordenes para la bateria (será decremental con el 
+    fin de distinguir las ordenes que fueron de bateria en la bdd
+    */
     grid.id_orden_bateria = 0;
 
     for(const auto &nodo : this->nodos)

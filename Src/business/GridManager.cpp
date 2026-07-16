@@ -42,6 +42,12 @@ void GridManager::procesarTick
     cargarLibroDeOrdenes(ordenes);
 
     /*
+    obtener desde la tabla config_tarifas, se usará dos veces dentro de 
+    procesarTick()
+    */
+    double precioBaseHorario = CapaDatos.obtenerPrecioBase(hora);
+
+    /*
     si la cantidad de kwh de la bateria es mayor a 0 podrá ofertarlos en el 
     matching, por lo tanto se debe añadir al libro de ordenes
     */
@@ -53,7 +59,7 @@ void GridManager::procesarTick
             false,
             bateria.getId(),
             bateria.getBalanceEnergia(),
-            CapaDatos.obtenerPrecioBase()
+            precioBaseHorario
         );
         
         //carga la oferta de la bateria en bidMap
@@ -77,8 +83,8 @@ void GridManager::procesarTick
             se usa "second.front" porque el valor es de tipo:
             queue<Orden>, por lo tanto sacar el primero que entró
             */
-            Orden ordenCompra = mejorBid->second.front();
-            Orden ordenVenta = mejorAsk->second.front();
+            Orden &ordenCompra = mejorBid->second.front();
+            Orden &ordenVenta = mejorAsk->second.front();
 
             /*
             Aclaracion: en la transacción no se guardan montos totales, sino que
@@ -153,16 +159,51 @@ void GridManager::procesarTick
     }
 
     /* 
-    Aca iría la transferencia de excedentes de energía de la transaccion, habría
+    Aca iría la transferencia de excedentes de energía de la transaccion. Habría
     que consultar si quedaron vendedores en el vector askMap, reunir la energía
-    total que tienen y pasarsela al NodoAlmacenamiento.
+    total que tienen y pasársela al NodoAlmacenamiento.
     Esto se hace fuera del while porque mientras se esté dentro del mismo 
-    todavía puede aparecer un comprador que consuma esa energía. También se
-    debería consultar el precio base horario para que las ofertas con excedentes
-    carguen los créditos de sus nodos correspondientes a ese precio base.
+    todavía puede aparecer un comprador que consuma esa energía.
     */
+    while(!askMap.empty())
+    {
+        //obtener el nivel de precio mas bajo del map
+        auto it = this->askMap.begin();
+
+        //obtener orden de venta
+        Orden &ordenVenta = it->second.front();
+        
+        /*
+        la energia comprada por la bateria se suma al objeto de C++ porque se 
+        sabe que la misma trabaja siempre en RAM (mas allá de que también sea 
+        persistida en la bdd)
+        */
+        bateria.balanceEnergia += ordenVenta.kwh;
+
+        TransaccionEnergia transaccionBateria = (
+            ordenVenta.idNodo,
+            bateria.getId(),
+            ordenVenta.kwh,
+            precioBaseHorario,
+            hora
+        );
+
+        //sumar la transacción al vector de transacciones a persistir
+        this->transacciones.push_back(transaccionBateria);
+
+        //eliminar esa orden de la cola
+        it->second.pop();
+
+        //¿quedan elementos en ese indice del mapa?
+        if(it->second.empty())
+        {
+            //borrar precio (indice) del mapa
+            this->askMap.erase();
+        }
+    }
 
     /*
     ya por último iría la persistencia de las transacciones en la bdd
     */
+   CapaDatos.persistirTransacciones(this->transacciones);
 }

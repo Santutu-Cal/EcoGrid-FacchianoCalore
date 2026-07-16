@@ -147,8 +147,16 @@ double obtenerPrecioBase(const std::string hora) const
 }
 
 void CapaDatos::persistirTransacciones
-    (const std::vector<TransaccionEnergia>& transacciones)
+    (std::vector<TransaccionEnergia>& transacciones)
 {
-    
+    soci::transaction tr(this->sql);
+
+    for(const auto &t : transacciones)
+    {
+        sql << "INSERT INTO transacciones(id_vendedor, id_comprador, kwh, precio_unitario, hora) VALUES (:vendedor, :comprador, :kwh, :precio)", soci::use(t.idVendedor, t.idComprador, 
+            t.kwh, t.precio);
+
+
+    }
 }
 

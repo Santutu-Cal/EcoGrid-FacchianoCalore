@@ -10,12 +10,7 @@ typedef struct TransaccionEnergia
     int idComprador;
     double kwh;
     double precio;
-    std::string hora;
-
-    /*
-    TransaccionEnergia(int idV, int idC, double k, double p, time t) :
-        idVendedor{idV}, idComprador{idC}, kwh{k}, precio{p}, timestamp{t} {}
-    */    
+    std::string hora;  
 
     void log() const;
 }TransaccionEnergia;

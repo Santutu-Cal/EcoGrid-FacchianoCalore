@@ -19,13 +19,16 @@ typedef std::map<double, std::queue<Orden>> aMap;
 class GridManager
 {
 private:
-    std::vector<TransaccionEnergia> transacciones;
+    std::vector<TransaccionEnergia>& transacciones;
     bMap bidMap; 
     aMap askMap; 
 
     void cargarLibroDeOrdenes(const std::vector<Orden>& ordenes);
 
-    //id apropiado para ofertas de venta de la bateria
+    /*
+    id apropiado para ofertas de venta de la bateria (no es id de la bateria,
+    es id de la orden de la bateria, no son lo mismo)
+    */
     int id_orden_bateria;
 
 public:

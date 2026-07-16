@@ -29,7 +29,7 @@ private:
 public:
     //persistir transacciones hechas en un tick
     void CapaDatos::persistirTransacciones
-        (const std::vector<TransaccionEnergia>& transacciones);
+        (std::vector<TransaccionEnergia>& transacciones);
     
     //consultar nodos (los obtiene) de la bdd
     std::vector<std::unique_ptr<NodoRed>> obtenerNodos();
