@@ -1,75 +1,5 @@
 #include "CapaDatos.hpp"
 
-//funciones de prueba
-
-//into trae datos SQL a C++
-void CapaDatos::insert()
-{
-    std::string n = "Hector";
-
-    this->sql << "INSERT INTO prueba(nombre) VALUES(:n)", soci::use(n);
-
-    std::cout << "¡INSERT hecho con éxito!" << std::endl;
-}
-
-
-void CapaDatos::select()
-{
-    //recibe el resultado de la consulta
-    int resultado;
-
-    //into manda datos al SQL
-    this->sql << "SELECT COUNT(nombre) FROM prueba", soci::into(resultado);
-
-    std::cout << "¡SELECT hecho con éxito!\n";
-    std::cout << "> La cantidad de nombres es: " << resultado << std::endl;
-}
-
-void CapaDatos::update()
-{
-    int id = 2;
-    std::string nombre = "Morfeo";
-
-    this->sql << "UPDATE prueba SET nombre=:nombre WHERE id=:id",
-        soci::use(nombre),
-        soci::use(id);
-
-    std::cout << "¡UPDATE hecho con éxito!" << std::endl;   
-}
-
-void CapaDatos::myDelete()
-{
-    int id = 4;
-
-    this->sql << "DELETE FROM prueba WHERE id=:id",
-        soci::use(id);
-
-    std::cout << "¡DELETE hecho con éxito!" << std::endl;     
-}
-
-void CapaDatos::mostrarTabla()
-{
-    soci::rowset<soci::row> filas = 
-        (this->sql.prepare << "SELECT id, nombre FROM prueba ORDER BY id");
-
-    std::cout << "--------------------------\n";
-    
-    for(soci::row& fila : filas)
-    {
-        int id = fila.get<int>("id");
-        std::string nombre = fila.get<std::string>("nombre");
-
-        std::cout << "ID: " << id
-                  << " | Nombre: " << nombre
-                  << '\n';
-    }
-
-    std::cout << "--------------------------\n";
-}
-
-
-//-----------------------------------------------------
-//acá empiezan las funciones que van en el TP realmente
 void CapaDatos::conectar()
 {
     try
@@ -106,8 +36,7 @@ std::vector<std::unique_ptr<NodoRed>> CapaDatos::obtenerNodos()
                 std::make_unique<NodoConsumidor>(
                     fila.get<int>("id"),
                     0,
-                    fila.get<double>("saldo_cuenta"),
-                    perfil
+                    fila.get<double>("saldo_cuenta")
                 )
             );
         }
@@ -117,7 +46,7 @@ std::vector<std::unique_ptr<NodoRed>> CapaDatos::obtenerNodos()
                 std::make_unique<NodoProsumidor>(
                     fila.get<int>("id"),
                     0,
-                    saldoCuenta.fila.get<double>("saldo_cuenta")
+                    fila.get<double>("saldo_cuenta")
                 )
             );
         }
@@ -135,12 +64,14 @@ std::vector<std::unique_ptr<NodoRed>> CapaDatos::obtenerNodos()
     return nodos;
 }
 
-double obtenerPrecioBase(const std::string hora) const
+double CapaDatos::obtenerPrecioBase(std::string hora)
 {
     //inicializo el contenedor del resultado de la consulta     
     double precio_base = 0.0;
+
     this->sql << "SELECT precio_base FROM config_tarifas WHERE hora= :hora",
         soci::use(hora), soci::into(precio_base);
+
     std::cout << "\n¡Consulta de precio base hecha con éxito!";
 
     return precio_base;
@@ -149,14 +80,105 @@ double obtenerPrecioBase(const std::string hora) const
 void CapaDatos::persistirTransacciones
     (std::vector<TransaccionEnergia>& transacciones)
 {
+    /*
+    iniciar (BEGIN) la transaccion, los insert y procedimientos que se hagan
+    quedarán en pendiente hasta que se haga un "tr.commit" (COMMIT). 
+    */
     soci::transaction tr(this->sql);
 
-    for(const auto &t : transacciones)
+    try
     {
-        sql << "INSERT INTO transacciones(id_vendedor, id_comprador, kwh, precio_unitario, hora) VALUES (:vendedor, :comprador, :kwh, :precio)", soci::use(t.idVendedor, t.idComprador, 
-            t.kwh, t.precio);
+        for(const auto &t : transacciones)
+        {
+            this->insertarTransaccion(t);
 
+            /*  
+            Nota: La batería no genera lecturas históricas. Sólo se registran 
+            los nodos consumidores y vendedores.
+            */
+            if(t.idVendedor != ID_BATERIA){
+                this->actualizarSaldoYLecturas(
+                    t.idVendedor,
+                    t.kwh,
+                    t.precio,
+                    "venta"
+                );
+            }
+            
+            if(t.idComprador != ID_BATERIA){                
+                this->actualizarSaldoYLecturas(
+                    t.idComprador,
+                    t.kwh,
+                    t.precio,
+                    "compra"
+                );
+            }
+        }
 
+        //commitear si hasta este punto no hubo ninguna excepción que manejar
+        tr.commit();
     }
+    catch(const std::exception &e)
+    {
+        /*
+        Nota: El ROLLBACK es hecho automáticamente por el destructor de objeto
+        "tr" declarado al principio de este método gracias a que sigue el prin -
+        - cipio de RAII
+        */
+
+        std::cerr << e.what() << '\n';
+        throw;
+    }    
 }
 
+void CapaDatos::insertarTransaccion(const TransaccionEnergia& t)
+{
+    /*
+    esa R que se ve al principio de la insert es una forma que tiene de 
+    c++ para poder meter "enters" en el código sin producir conflictos 
+    sintácticos"
+    */   
+    this->sql << 
+    R"(
+        INSERT INTO transacciones
+        (
+            id_vendedor, 
+            id_comprador, 
+            kwh, 
+            precio_unitario, 
+            hora
+        ) 
+        VALUES 
+        (
+            :vendedor, 
+            :comprador, 
+            :kwh, 
+            :precio, 
+            :hora   
+        )
+    )", 
+    soci::use(t.idVendedor);
+    soci::use(t.idComprador);
+    soci::use(t.kwh);
+    soci::use(t.precio);
+    soci::use(t.hora);   
+}
+
+void CapaDatos::actualizarSaldoYLecturas(
+    int idNodo, double kwh, double precio, const std::string& tipo)
+{
+    this->sql <<
+    R"(
+        CALL actualizar_saldo_y_lecturas
+        (
+            :idNodo,
+            :kwh,
+            :precio,
+            :tipo
+        )
+    )",
+    soci::use(idNodo);
+    soci::use(kwh);
+    soci::use(precio);
+    soci::use(tipo);
+}
