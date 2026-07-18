@@ -11,10 +11,7 @@ private:
     double saldoCuenta;     //créditos
 
 public:
-    NodoRed(int id, 
-        double balanceEnergia, 
-        double saldoCuenta
-    );
+    NodoRed(int id, double balanceEnergia, double saldoCuenta);
     virtual ~NodoRed() = default; 
 
     int getId() const;

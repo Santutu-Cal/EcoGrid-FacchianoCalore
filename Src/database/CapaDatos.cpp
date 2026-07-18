@@ -69,7 +69,7 @@ double CapaDatos::obtenerPrecioBase(std::string hora)
     //inicializo el contenedor del resultado de la consulta     
     double precio_base = 0.0;
 
-    this->sql << "SELECT precio_base FROM config_tarifas WHERE hora= :hora",
+    this->sql << "SELECT precio_base_kwh FROM config_tarifas WHERE hora= :hora",
         soci::use(hora), soci::into(precio_base);
 
     std::cout << "\n¡Consulta de precio base hecha con éxito!";
@@ -154,7 +154,7 @@ void CapaDatos::insertarTransaccion(const TransaccionEnergia& t)
             :comprador, 
             :kwh, 
             :precio, 
-            :hora   
+            1:hora   
         )
     )", 
     soci::use(t.idVendedor);
