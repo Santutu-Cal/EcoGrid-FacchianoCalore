@@ -67,13 +67,19 @@ void GridManager::inyectarBateriaEnMatching(
 void GridManager::procesarTick(
     NodoAlmacenamiento& bateria, 
     const std::vector<Orden> &ordenes, 
-    const std::string hora, 
+    int hora, 
     CapaDatos& cp
 )
 {
     //limpiar estructuras de datos para que no quede basura de anteriores ticks
     this->bidMap.clear();
     this->askMap.clear();
+
+    //limpiar vector de transacciones
+    this->transacciones.clear();
+
+    //inicializar contador de transacciones completas por tick
+    this->transaccionesCompletadas = 0;
 
     //carga bidMap y askMap de ordenes correspondientes a cada uno
     this->cargarLibroDeOrdenes(ordenes);
@@ -82,9 +88,6 @@ void GridManager::procesarTick(
     double precioBaseHorario = cp.obtenerPrecioBase(hora);
 
     inyectarBateriaEnMatching(bateria, precioBaseHorario);
-
-    //inicializar contador de transacciones completas por tick
-    this->transaccionesCompletadas = 0;
 
     //mientras los dos mapas contengan ordenes (comienza el matching)
     while(!this->bidMap.empty() && !this->askMap.empty())
@@ -119,11 +122,11 @@ void GridManager::procesarTick(
             double precio = (ordenCompra.precio + ordenVenta.precio) / 2;
             
             //depuracion de cantidades de kwh y precio
+            std::cout << "\n> Transaccion en curso: \n";
             std::cout << "Compra: " << ordenCompra.kwh << '\n';
             std::cout << "Venta : " << ordenVenta.kwh << '\n';
             std::cout << "Energia a transaccionar: " << energia << '\n';
             std::cout << "Precio de transaccion: " << precio << '\n';
-            //pronto será eliminado
 
             /*
             actualizar campos de energía. Del comprador se resta la cantidad
@@ -139,7 +142,7 @@ void GridManager::procesarTick(
                 ordenCompra.idNodo,
                 energia,
                 precio,
-                hora + ":00"
+                hora
             };
             
             //añadir al vector de transaccioes del objeto la transaccion hecha
@@ -226,17 +229,28 @@ void GridManager::procesarTick(
         }
     }
 
-    //persistir transacciones en la bdd
-    cp.persistirTransacciones(this->transacciones);
+        try
+        {
+            //persistir transacciones en la bdd
+            cp.persistirTransacciones(this->transacciones);
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what();
+            throw;
+        }
 
     this->logTick(hora);
 }
 
-void GridManager::logTick(const std::string hora) const
+void GridManager::logTick(int hora) const
 {
-    std::cout << "\n--------> Tick completado <--------\n"
-    << "-Hora transcurrida en el tick: " + hora
-    << "\n-Se completaron y persisitieron " + this->transaccionesCompletadas
-    << " transacciones en este tick"
-    << "\n<--------------------------------->" << std::endl;
+    std::cout
+        << "\n--------> Tick completado <--------\n"
+        << "-Hora transcurrida en el tick: " << hora
+        << "\n-Se completaron y persistieron "
+        << this->transaccionesCompletadas
+        << " transacciones en este tick"
+        << "\n<--------------------------------->"
+        << std::endl;
 }

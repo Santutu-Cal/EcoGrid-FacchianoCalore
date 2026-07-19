@@ -31,13 +31,11 @@ private:
     //contar cantidad de transacciones completadas en un tick
     int transaccionesCompletadas;
 
-
-
     //cargar las ordenes provenientes de archivoCSV al libro de órdenes
     void cargarLibroDeOrdenes(const std::vector<Orden>& ordenes);
 
     //cargar bateria como vendededora en el libro de ordenes (en forma de orden)
-    void GridManager::inyectarBateriaEnMatching
+    void inyectarBateriaEnMatching
         (NodoAlmacenamiento& bateria, double precioBaseHorario);    
 
 public:
@@ -55,11 +53,11 @@ public:
     void procesarTick(
         NodoAlmacenamiento& bateria, 
         const std::vector<Orden> &ordenes, 
-        const std::string hora, 
+        int hora, 
         CapaDatos& cd
     );
 
-    void logTick(const std::string hora) const;
+    void logTick(int hora) const;
 };
 
 #endif

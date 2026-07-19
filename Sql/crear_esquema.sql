@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS lecturas_historicas(
 
     id_nodo INTEGER NOT NULL,
 
-    hora CHAR(2)
+    hora SMALLINT
         CHECK (hora BETWEEN '00' AND '23'),
 
     kwh NUMERIC(10,2) NOT NULL,
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS transacciones(
     precio_unitario NUMERIC(10,2) NOT NULL
         CHECK (precio_unitario > 0),
 
-    hora CHAR(2)
+    hora SMALLINT
         CHECK (hora BETWEEN '00' AND '23'),
 
     FOREIGN KEY(id_vendedor)
@@ -121,7 +121,7 @@ CREATE OR REPLACE PROCEDURE actualizar_saldo_y_lecturas(
     p_kwh NUMERIC,
     p_precio NUMERIC,
     p_tipo_operacion VARCHAR(10),
-    p_hora CHAR(2)
+    p_hora SMALLINT
 
 )
 LANGUAGE plpgsql

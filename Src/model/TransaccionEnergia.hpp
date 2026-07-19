@@ -10,7 +10,7 @@ typedef struct TransaccionEnergia
     int idComprador;
     double kwh;
     double precio;
-    std::string hora;  
+    int hora;
 
     void logTransaccion() const;
 }TransaccionEnergia;

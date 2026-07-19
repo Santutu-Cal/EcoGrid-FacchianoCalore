@@ -19,11 +19,8 @@ void Simulador::ejecutar()
     for(const auto& nodo : this->nodos)
     {
         //si es NodoAlmacenamiento* accede al scope del if y lo castea a 
-        if(
-            //obtener puntero crudo desde unique_ptr con el metodo "get"
-            NodoAlmacenamiento* b = 
-                dynamic_cast<NodoAlmacenamiento*>(nodo.get())
-        )
+        if(//obtener puntero crudo desde unique_ptr con el metodo "get"
+            b = dynamic_cast<NodoAlmacenamiento*>(nodo.get()))
         {
             //frenar porque ya se encontró la bateria
             break;
@@ -46,13 +43,18 @@ void Simulador::ejecutar()
         //log de archivo en proceso
         std::cout << "\n" << archivoCSV << std::endl;
 
-        //obtener la hora del archivo para pasársela a procesarTick
-        const std::string hora = archivoCSV.substr(8,2);
+        //obtener la hora del nombre del archivo para pasársela a procesarTick
+        std::string horaStr = archivoCSV.substr(14,2);
+        
+        //castear la hora a int para facilitar las interacciones con el programa
+        int hora;
+        hora = std::stoi(horaStr);
 
         //obtiene las ordenes del archivo
         auto ordenes = lector.leerOrdenes(archivoCSV);
         
         //procesa las ordenes obtenidas del archivo
         grid.procesarTick(bateria, ordenes, hora, cp);
-    }
+    }    
+    std::cout << "\n>>> SIMULACION TERMINADA <<<" << std::endl;
 }

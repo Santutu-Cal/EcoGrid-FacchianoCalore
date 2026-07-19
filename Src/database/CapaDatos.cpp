@@ -19,6 +19,20 @@ void CapaDatos::conectar()
     }
 }
 
+PerfilConsumo CapaDatos::stringAPerfil(const std::string& perfil)
+{
+    if(perfil == "Residencial")
+        return PerfilConsumo::Residencial;
+
+    if(perfil == "Comercial")
+        return PerfilConsumo::Comercial;
+
+    if(perfil == "Industrial")
+        return PerfilConsumo::Industrial;
+
+    throw std::runtime_error("Perfil de consumo inválido.");
+}
+
 std::vector<std::unique_ptr<NodoRed>> CapaDatos::obtenerNodos()
 {
     std::vector<std::unique_ptr<NodoRed>> nodos;
@@ -32,11 +46,15 @@ std::vector<std::unique_ptr<NodoRed>> CapaDatos::obtenerNodos()
         std::string tipo = fila.get<std::string>("tipo");
         if(tipo=="consumidor")
         {
+            std::string perfilStr = fila.get<std::string>("perfil_consumo");
+            PerfilConsumo perfil = this->stringAPerfil(perfilStr);
+
             nodos.push_back(
                 std::make_unique<NodoConsumidor>(
                     fila.get<int>("id"),
                     0,
-                    fila.get<double>("saldo_cuenta")
+                    fila.get<double>("saldo_cuenta"),
+                    perfil
                 )
             );
         }
@@ -44,7 +62,7 @@ std::vector<std::unique_ptr<NodoRed>> CapaDatos::obtenerNodos()
         {
             nodos.push_back(
                 std::make_unique<NodoProsumidor>(
-                    fila.get<int>("id"),
+                    fila.get<int>("id_nodo"),
                     0,
                     fila.get<double>("saldo_cuenta")
                 )
@@ -54,7 +72,7 @@ std::vector<std::unique_ptr<NodoRed>> CapaDatos::obtenerNodos()
         {
             nodos.push_back(
                 std::make_unique<NodoAlmacenamiento>(
-                fila.get<int>("id"),
+                fila.get<int>("id_nodo"),
                 0,
                 fila.get<double>("saldo_cuenta")
                 )
@@ -64,15 +82,15 @@ std::vector<std::unique_ptr<NodoRed>> CapaDatos::obtenerNodos()
     return nodos;
 }
 
-double CapaDatos::obtenerPrecioBase(const std::string hora)
+double CapaDatos::obtenerPrecioBase(int hora)
 {
     //inicializo el contenedor del resultado de la consulta     
     double precio_base = 0.0;
 
-    this->sql << "SELECT precio_base_kwh FROM config_tarifas WHERE hora= :hora",
+    this->sql << "SELECT precio_base_kwh FROM config_tarifas WHERE hora=:hora",
         soci::use(hora), soci::into(precio_base);
 
-    std::cout << "\n¡Consulta de precio base hecha con éxito!";
+    std::cout << "\n¡Consulta de precio base hecha con éxito!" << std::endl;
 
     return precio_base;
 }
@@ -151,16 +169,15 @@ void CapaDatos::insertarTransaccion(const TransaccionEnergia& t)
             :hora   
         )
     )", 
-    soci::use(t.idVendedor);
-    soci::use(t.idComprador);
-    soci::use(t.kwh);
-    soci::use(t.precio);
-    soci::use(t.hora);   
+    soci::use(t.idVendedor, "vendedor"),
+    soci::use(t.idComprador, "comprador"),
+    soci::use(t.kwh, "kwh"),
+    soci::use(t.precio, "precio"),
+    soci::use(t.hora, "hora");   
 }
 
 void CapaDatos::actualizarSaldoYLecturas
-    (int idNodo, double kwh, double precio, const std::string& tipo, 
-        const std::string hora)
+    (int idNodo, double kwh, double precio, const std::string& tipo, int hora)
 {
     this->sql <<
     R"(
@@ -173,9 +190,9 @@ void CapaDatos::actualizarSaldoYLecturas
             :hora
         )
     )",
-    soci::use(idNodo);
-    soci::use(kwh);
-    soci::use(precio);
-    soci::use(tipo);
-    soci::use(hora);
+    soci::use(idNodo, "idNodo"),
+    soci::use(kwh, "kwh"),
+    soci::use(precio, "precio"),
+    soci::use(tipo, "tipo_operacion"),
+    soci::use(hora, "hora");
 }

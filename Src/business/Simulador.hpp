@@ -12,6 +12,7 @@
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
+#include <string>
 
 class Simulador
 {
@@ -23,7 +24,6 @@ private:
     std::vector<std::unique_ptr<NodoRed>> nodos;
 
     const std::vector<std::string> archivos{
-        "Datos/ofertas_00.csv",
         "Datos/ofertas_10.csv",
         "Datos/ofertas_12.csv",
         "Datos/ofertas_14.csv",
