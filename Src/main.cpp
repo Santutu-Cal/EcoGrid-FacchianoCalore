@@ -15,7 +15,7 @@ int main(void)
     << std::endl;
 
     /*
-    //pruebas iniciales con la conexion a la bdd
+    //pruebas básicas con la conexion a la bdd
     CapaDatos cd;
     cd.conectar();
     cd.insert();
@@ -24,10 +24,9 @@ int main(void)
     cd.mostrarTabla();
     */
 
-    //empieza el programa
+    //empieza el programa real
     Simulador s;
     s.ejecutar();
-
 
     return 0;
 }

@@ -1,5 +1,15 @@
 #include "GridManager.hpp"
 
+int GridManager::getIdOrdenBateria()
+{
+    return this->idOrdenBateria;
+}
+
+void GridManager::setIdOrdenBateria(int id)
+{
+    this->idOrdenBateria = id; 
+}
+
 void GridManager::cargarLibroDeOrdenes(const std::vector<Orden> &ordenes)
 {
     for(const auto& orden : ordenes)
@@ -27,26 +37,9 @@ procesarTick:
 6) Si una cola de un determinado precio queda vacía, eliminar esa entrada.
 7) Volvér a evaluar la condición del while.
 */
-void GridManager::procesarTick
-(NodoAlmacenamiento bateria, const std::vector<Orden> &ordenes, 
-    const std::string hora)
+void GridManager::inyectarBateriaEnMatching(
+    NodoAlmacenamiento& bateria, double precioBaseHorario)
 {
-    /*
-    limpio las estructuras de datos para que no quede basura de anteriores 
-    ticks, cosa de que los siguientes procesamiento sean limpios
-    */
-    this->bidMap.clear();
-    this->askMap.clear();
-
-    //carga bidMap y askMap de ordenes correspondientes a cada uno
-    cargarLibroDeOrdenes(ordenes);
-
-    /*
-    obtener desde la tabla config_tarifas, se usará dos veces dentro de 
-    procesarTick()
-    */
-    double precioBaseHorario = CapaDatos.obtenerPrecioBase(hora);
-
     /*
     si la cantidad de kwh de la bateria es mayor a 0 podrá ofertarlos en el 
     matching, por lo tanto se debe añadir al libro de ordenes
@@ -54,24 +47,51 @@ void GridManager::procesarTick
     if(bateria.getBalanceEnergia() > 0)
     {
         //crea un struct Orden para poder almacenarlo en el libro de ordenes
-        Orden orden_bateria(
-            this->id_orden_bateria--,
+        Orden ordenBateria 
+        {
+            //decrementar para generar un id de orden para la bateria
+            this->idOrdenBateria--,
+            //false porque es una venta
             false,
             bateria.getId(),
             bateria.getBalanceEnergia(),
             precioBaseHorario
-        );
+        };
         
         //carga la oferta de la bateria en bidMap
-        this->askMap[orden_bateria.precio].push(orden_bateria);
+        this->askMap[ordenBateria.precio].push(ordenBateria);
     }
+}
 
-    //mientras los dos mapas contengan ordenes
+
+void GridManager::procesarTick(
+    NodoAlmacenamiento& bateria, 
+    const std::vector<Orden> &ordenes, 
+    const std::string hora, 
+    CapaDatos& cp
+)
+{
+    //limpiar estructuras de datos para que no quede basura de anteriores ticks
+    this->bidMap.clear();
+    this->askMap.clear();
+
+    //carga bidMap y askMap de ordenes correspondientes a cada uno
+    this->cargarLibroDeOrdenes(ordenes);
+
+    //obtener precio base segun horario (utilizado en interacciones de la bateria)
+    double precioBaseHorario = cp.obtenerPrecioBase(hora);
+
+    inyectarBateriaEnMatching(bateria, precioBaseHorario);
+
+    //inicializar contador de transacciones completas por tick
+    this->transaccionesCompletadas = 0;
+
+    //mientras los dos mapas contengan ordenes (comienza el matching)
     while(!this->bidMap.empty() && !this->askMap.empty())
     {
         /*
-        toma de bidMap la mejor oferta de compra y toma la mejor oferta de 
-        venta de askMap (ordenes)
+        toma de bidMap el mejor precio de compra y toma de askMap el mejor 
+        precio de venta (iteradores)
         */
         auto mejorBid = this->bidMap.begin();
         auto mejorAsk = this->askMap.begin();
@@ -83,8 +103,8 @@ void GridManager::procesarTick
             se usa "second.front" porque el valor es de tipo:
             queue<Orden>, por lo tanto sacar el primero que entró
             */
-            Orden &ordenCompra = mejorBid->second.front();
-            Orden &ordenVenta = mejorAsk->second.front();
+            Orden& ordenCompra = mejorBid->second.front();
+            Orden& ordenVenta = mejorAsk->second.front();
 
             /*
             Aclaracion: en la transacción no se guardan montos totales, sino que
@@ -92,7 +112,7 @@ void GridManager::procesarTick
             debería de modificar saldos 
             */
 
-            //cantidad de energia transaccionada
+            //cantidad de energia a transaccionar
             double energia = std::min(ordenCompra.kwh, ordenVenta.kwh);
 
             //precio de transaccion
@@ -101,7 +121,8 @@ void GridManager::procesarTick
             //depuracion de cantidades de kwh y precio
             std::cout << "Compra: " << ordenCompra.kwh << '\n';
             std::cout << "Venta : " << ordenVenta.kwh << '\n';
-            std::cout << "Energia: " << energia << '\n';
+            std::cout << "Energia a transaccionar: " << energia << '\n';
+            std::cout << "Precio de transaccion: " << precio << '\n';
             //pronto será eliminado
 
             /*
@@ -124,8 +145,11 @@ void GridManager::procesarTick
             //añadir al vector de transaccioes del objeto la transaccion hecha
             this->transacciones.push_back(transaccion);
 
+            //transaccion completa, contador incrementa
+            this->transaccionesCompletadas++;
+
             //imprimir informacion de transacción
-            transaccion.log();
+            transaccion.logTransaccion();
 
             /*
             este último sector busca verificar si las dos ordenes que partici - 
@@ -159,51 +183,60 @@ void GridManager::procesarTick
     }
 
     /* 
-    Aca iría la transferencia de excedentes de energía de la transaccion. Habría
-    que consultar si quedaron vendedores en el vector askMap, reunir la energía
-    total que tienen y pasársela al NodoAlmacenamiento.
-    Esto se hace fuera del while porque mientras se esté dentro del mismo 
-    todavía puede aparecer un comprador que consuma esa energía.
+    Consultar si quedaron vendedores en el vector askMap y hacer una transacción
+    con cada uno. Esto se hace fuera del while porque mientras se esté dentro 
+    del mismo todavía puede aparecer un comprador que consuma esa energía.
     */
     while(!askMap.empty())
     {
         //obtener el nivel de precio mas bajo del map
-        auto it = this->askMap.begin();
+        auto ask = this->askMap.begin();
 
         //obtener orden de venta
-        Orden &ordenVenta = it->second.front();
+        Orden& ordenVenta = ask->second.front();
         
         /*
         la energia comprada por la bateria se suma al objeto de C++ porque se 
         sabe que la misma trabaja siempre en RAM (mas allá de que también sea 
         persistida en la bdd)
         */
-        bateria.balanceEnergia += ordenVenta.kwh;
+        bateria.setBalanceEnergia(
+            bateria.getBalanceEnergia() + ordenVenta.kwh);
 
-        TransaccionEnergia transaccionBateria = (
+        TransaccionEnergia transaccionBateria
+        {
             ordenVenta.idNodo,
             bateria.getId(),
             ordenVenta.kwh,
             precioBaseHorario,
             hora
-        );
+        };
 
         //sumar la transacción al vector de transacciones a persistir
         this->transacciones.push_back(transaccionBateria);
 
         //eliminar esa orden de la cola
-        it->second.pop();
+        ask->second.pop();
 
         //¿quedan elementos en ese indice del mapa?
-        if(it->second.empty())
+        if(ask->second.empty())
         {
             //borrar precio (indice) del mapa
-            this->askMap.erase();
+            this->askMap.erase(ask);
         }
     }
 
-    /*
-    ya por último iría la persistencia de las transacciones en la bdd
-    */
-   CapaDatos.persistirTransacciones(this->transacciones);
+    //persistir transacciones en la bdd
+    cp.persistirTransacciones(this->transacciones);
+
+    this->logTick(hora);
+}
+
+void GridManager::logTick(const std::string hora) const
+{
+    std::cout << "\n--------> Tick completado <--------\n"
+    << "-Hora transcurrida en el tick: " + hora
+    << "\n-Se completaron y persisitieron " + this->transaccionesCompletadas
+    << " transacciones en este tick"
+    << "\n<--------------------------------->" << std::endl;
 }

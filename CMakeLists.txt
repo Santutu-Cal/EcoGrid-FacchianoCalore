@@ -40,6 +40,7 @@ add_executable(EcoGrid
     Src/model/NodoRed.cpp
     Src/model/NodoConsumidor.cpp
     Src/model/NodoProsumidor.cpp
+    Src/model/NodoAlmacenamiento.cpp
     Src/model/TransaccionEnergia.cpp
 
     Src/database/CapaDatos.cpp

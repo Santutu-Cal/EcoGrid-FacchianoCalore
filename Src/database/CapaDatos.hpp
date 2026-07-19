@@ -34,7 +34,8 @@ private:
 
     //ejecutar proc almacenado de los nodos participantes de la transaccion
     void actualizarSaldoYLecturas(
-        int idNodo, double kwh, double precio, const std::string& tipo);
+        int idNodo, double kwh, double precio, const std::string& tipo, 
+            const std::string hora);
 
 public:
 
@@ -42,7 +43,7 @@ public:
     void conectar();
 
     //obtener precio base correspondiente
-    double obtenerPrecioBase(std::string hora);
+    double obtenerPrecioBase(const std::string hora);
 
     //consultar nodos (los obtiene) de la bdd
     std::vector<std::unique_ptr<NodoRed>> obtenerNodos();

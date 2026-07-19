@@ -9,15 +9,20 @@ balanceEnergia(balanceEnergia), saldoCuenta(saldoCuenta){}
 //getters
 int NodoRed::getId() const
 {
-    return id;
+    return this->id;
 }
 
 double NodoRed::getBalanceEnergia() const
 {
-    return balanceEnergia;
+    return this->balanceEnergia;
 }
 
 double NodoRed::getSaldoCuenta() const
 {
-    return saldoCuenta;
+    return this->saldoCuenta;
+}
+
+void NodoRed::setBalanceEnergia(double kwh)
+{
+    this->balanceEnergia = kwh;
 }

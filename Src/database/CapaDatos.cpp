@@ -64,7 +64,7 @@ std::vector<std::unique_ptr<NodoRed>> CapaDatos::obtenerNodos()
     return nodos;
 }
 
-double CapaDatos::obtenerPrecioBase(std::string hora)
+double CapaDatos::obtenerPrecioBase(const std::string hora)
 {
     //inicializo el contenedor del resultado de la consulta     
     double precio_base = 0.0;
@@ -92,27 +92,21 @@ void CapaDatos::persistirTransacciones
         {
             this->insertarTransaccion(t);
 
-            /*  
-            Nota: La batería no genera lecturas históricas. Sólo se registran 
-            los nodos consumidores y vendedores.
-            */
-            if(t.idVendedor != ID_BATERIA){
-                this->actualizarSaldoYLecturas(
-                    t.idVendedor,
-                    t.kwh,
-                    t.precio,
-                    "venta"
-                );
-            }
-            
-            if(t.idComprador != ID_BATERIA){                
-                this->actualizarSaldoYLecturas(
-                    t.idComprador,
-                    t.kwh,
-                    t.precio,
-                    "compra"
-                );
-            }
+            this->actualizarSaldoYLecturas(
+                t.idVendedor,
+                t.kwh,
+                t.precio,
+                "venta",
+                t.hora
+            );
+                       
+            this->actualizarSaldoYLecturas(
+                t.idComprador,
+                t.kwh,
+                t.precio,
+                "compra",
+                t.hora
+            );
         }
 
         //commitear si hasta este punto no hubo ninguna excepción que manejar
@@ -125,7 +119,7 @@ void CapaDatos::persistirTransacciones
         "tr" declarado al principio de este método gracias a que sigue el prin -
         - cipio de RAII
         */
-
+        
         std::cerr << e.what() << '\n';
         throw;
     }    
@@ -154,7 +148,7 @@ void CapaDatos::insertarTransaccion(const TransaccionEnergia& t)
             :comprador, 
             :kwh, 
             :precio, 
-            1:hora   
+            :hora   
         )
     )", 
     soci::use(t.idVendedor);
@@ -164,8 +158,9 @@ void CapaDatos::insertarTransaccion(const TransaccionEnergia& t)
     soci::use(t.hora);   
 }
 
-void CapaDatos::actualizarSaldoYLecturas(
-    int idNodo, double kwh, double precio, const std::string& tipo)
+void CapaDatos::actualizarSaldoYLecturas
+    (int idNodo, double kwh, double precio, const std::string& tipo, 
+        const std::string hora)
 {
     this->sql <<
     R"(
@@ -174,11 +169,13 @@ void CapaDatos::actualizarSaldoYLecturas(
             :idNodo,
             :kwh,
             :precio,
-            :tipo
+            :tipo_operacion,
+            :hora
         )
     )",
     soci::use(idNodo);
     soci::use(kwh);
     soci::use(precio);
     soci::use(tipo);
+    soci::use(hora);
 }

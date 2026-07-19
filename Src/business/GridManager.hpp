@@ -4,7 +4,9 @@
 #include "LectorCSV.hpp"
 
 #include "Orden.hpp"
+
 #include "TransaccionEnergia.hpp"
+
 #include "NodoAlmacenamiento.hpp"
 
 #include "CapaDatos.hpp"
@@ -19,27 +21,45 @@ typedef std::map<double, std::queue<Orden>> aMap;
 class GridManager
 {
 private:
-    std::vector<TransaccionEnergia>& transacciones;
+    std::vector<TransaccionEnergia> transacciones;
     bMap bidMap; 
     aMap askMap; 
 
+    //id para ofertas de venta de la bateria (ordenes)
+    int idOrdenBateria;
+
+    //contar cantidad de transacciones completadas en un tick
+    int transaccionesCompletadas;
+
+
+
+    //cargar las ordenes provenientes de archivoCSV al libro de órdenes
     void cargarLibroDeOrdenes(const std::vector<Orden>& ordenes);
 
-    /*
-    id apropiado para ofertas de venta de la bateria (no es id de la bateria,
-    es id de la orden de la bateria, no son lo mismo)
-    */
-    int id_orden_bateria;
+    //cargar bateria como vendededora en el libro de ordenes (en forma de orden)
+    void GridManager::inyectarBateriaEnMatching
+        (NodoAlmacenamiento& bateria, double precioBaseHorario);    
 
 public:
+
+    int getIdOrdenBateria();
+    void setIdOrdenBateria(int id);
+
     /*
-    en la praćtica procesarTick le pasará como argumento el nombre del archivo a
-    cargarLibroDeOrdenes. La batería una vez fue cargada desde la bdd, siempre 
-    trabajará en RAM
+    deberá recibir como argumento:
+    1) bateria (como puntero inteligente)
+    2) vector de ordenes a procesar
+    3) string que representa la hora del tick
+    4) referencia de la conexion a la bdd
     */
-    void procesarTick
-    (NodoAlmacenamiento bateria, const std::vector<Orden> &ordenes, 
-        const std::string hora);
+    void procesarTick(
+        NodoAlmacenamiento& bateria, 
+        const std::vector<Orden> &ordenes, 
+        const std::string hora, 
+        CapaDatos& cd
+    );
+
+    void logTick(const std::string hora) const;
 };
 
 #endif

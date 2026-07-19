@@ -2,6 +2,7 @@
 
 void Simulador::ejecutar()
 {
+    //instanciar objetos necesarios para la simulación
     LectorCSV lector;
     GridManager grid;
     CapaDatos cp;
@@ -9,23 +10,35 @@ void Simulador::ejecutar()
     //conectar bdd y cargar nodos de la misma (inicializándolos)
     cp.conectar();
     this->nodos = cp.obtenerNodos();
-
-    //instanciar la bateria (aún no inicializada con valores de la bdd)
-    std::unique_ptr<NodoAlmacenamiento> bateria;
     
-    /*
-    inicializar el id de las ordenes para la bateria (será decremental con el 
-    fin de distinguir las ordenes que fueron de bateria en la bdd
-    */
-    grid.id_orden_bateria = 0;
+    //inicializar el id de las ordenes para la bateria
+    grid.setIdOrdenBateria(0);
 
-    for(const auto &nodo : this->nodos)
+    //encontrar la bateria en el vector de nodos
+    NodoAlmacenamiento* b = nullptr;
+    for(const auto& nodo : this->nodos)
     {
-        //si es NodoAlmacenamiento accede al scope del if
-        if(auto bat : std::dynamic_pointer_cast<NodoAlmacenamiento>(nodo))
-            //bateria con valores ya cargados, argumento para procesarTick()
-            bateria = bat;
+        //si es NodoAlmacenamiento* accede al scope del if y lo castea a 
+        if(
+            //obtener puntero crudo desde unique_ptr con el metodo "get"
+            NodoAlmacenamiento* b = 
+                dynamic_cast<NodoAlmacenamiento*>(nodo.get())
+        )
+        {
+            //frenar porque ya se encontró la bateria
+            break;
+        }    
     }
+
+    if(!b)
+    {
+        throw std::runtime_error(
+            "\nERROR: no se pudo encontrar un NodoAlmacenamiento\n"
+        );
+    }
+
+    //referencia segura que contiene la batería
+    NodoAlmacenamiento& bateria = *b;
 
     //acceder a archivos secuencialmente, leer las ordenes y procesarlas
     for(const auto& archivoCSV : this->archivos)
@@ -40,6 +53,6 @@ void Simulador::ejecutar()
         auto ordenes = lector.leerOrdenes(archivoCSV);
         
         //procesa las ordenes obtenidas del archivo
-        grid.procesarTick(bateria, ordenes, hora);
+        grid.procesarTick(bateria, ordenes, hora, cp);
     }
 }

@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <stdexcept>
 
 class Simulador
 {

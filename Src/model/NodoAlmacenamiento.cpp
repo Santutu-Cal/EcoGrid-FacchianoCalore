@@ -8,5 +8,5 @@ double balanceEnergia, double saldoCuenta)
 //Polimorfismo
 double NodoAlmacenamiento::calcularExcedente() 
 {
-    return getBalanceEnergia();
+    return this->getBalanceEnergia();
 }
