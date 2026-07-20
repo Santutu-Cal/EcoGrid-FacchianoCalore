@@ -123,8 +123,10 @@ void GridManager::procesarTick(
             
             //depuracion de cantidades de kwh y precio
             std::cout << "\n> Transaccion en curso: \n";
+            std::cout << "ID Orden de compra: " << ordenCompra.idOrden << '\n';
+            std::cout << "ID Orden de venta: " << ordenVenta.idOrden << '\n';
             std::cout << "Compra: " << ordenCompra.kwh << '\n';
-            std::cout << "Venta : " << ordenVenta.kwh << '\n';
+            std::cout << "Venta: " << ordenVenta.kwh << '\n';
             std::cout << "Energia a transaccionar: " << energia << '\n';
             std::cout << "Precio de transaccion: " << precio << '\n';
 
@@ -229,16 +231,7 @@ void GridManager::procesarTick(
         }
     }
 
-        try
-        {
-            //persistir transacciones en la bdd
-            cp.persistirTransacciones(this->transacciones);
-        }
-        catch(const std::exception& e)
-        {
-            std::cerr << e.what();
-            throw;
-        }
+    cp.persistirTransacciones(this->transacciones);
 
     this->logTick(hora);
 }
@@ -247,10 +240,10 @@ void GridManager::logTick(int hora) const
 {
     std::cout
         << "\n--------> Tick completado <--------\n"
-        << "-Hora transcurrida en el tick: " << hora
+        << "-Hora transcurrida en el tick: " << hora << ":00"
         << "\n-Se completaron y persistieron "
         << this->transaccionesCompletadas
-        << " transacciones en este tick"
+        << " transaccion/es en este tick"
         << "\n<--------------------------------->"
         << std::endl;
 }

@@ -7,10 +7,16 @@ void Simulador::ejecutar()
     GridManager grid;
     CapaDatos cp;
 
-    //conectar bdd y cargar nodos de la misma (inicializándolos)
-    cp.conectar();
-    this->nodos = cp.obtenerNodos();
-    
+    try{
+        //conectar bdd y cargar nodos de la misma (inicializándolos)
+        cp.conectar();
+        this->nodos = cp.obtenerNodos();
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << "\n¡Conexión rechazada a la bdd!\n"; 
+    }
+
     //inicializar el id de las ordenes para la bateria
     grid.setIdOrdenBateria(0);
 
@@ -18,9 +24,12 @@ void Simulador::ejecutar()
     NodoAlmacenamiento* b = nullptr;
     for(const auto& nodo : this->nodos)
     {
-        //si es NodoAlmacenamiento* accede al scope del if y lo castea a 
-        if(//obtener puntero crudo desde unique_ptr con el metodo "get"
-            b = dynamic_cast<NodoAlmacenamiento*>(nodo.get()))
+        //castear de NodoRed* a NodoAlmacenamiento*
+        //obtener puntero crudo desde unique_ptr con el metodo "get"
+        b = dynamic_cast<NodoAlmacenamiento*>(nodo.get());
+        
+        //verificar si tiene contenido (NodoAlmacenamiento)
+        if(b)
         {
             //frenar porque ya se encontró la bateria
             break;

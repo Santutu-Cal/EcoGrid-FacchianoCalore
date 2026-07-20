@@ -14,19 +14,21 @@ int main(void)
     << std::filesystem::current_path()
     << std::endl;
 
-    /*
-    //pruebas básicas con la conexion a la bdd
-    CapaDatos cd;
-    cd.conectar();
-    cd.insert();
-    cd.select();
-    cd.update();
-    cd.mostrarTabla();
-    */
+    try
+    {
+      Simulador s;
+      s.ejecutar();
+      
+      return 0;
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << "Fatal error: "
+        << e.what()
+        << std::endl;
 
-    //empieza el programa real
-    Simulador s;
-    s.ejecutar();
-    
+        return 1;
+    }
+
   return 0;
 }
