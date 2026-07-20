@@ -57,6 +57,8 @@ public:
         CapaDatos& cd
     );
 
+    void liquidarExcedentes();
+
     void logTick(int hora) const;
 };
 

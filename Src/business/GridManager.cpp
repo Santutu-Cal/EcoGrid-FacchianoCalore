@@ -187,12 +187,21 @@ void GridManager::procesarTick(
         }
     }
 
+    this->liquidarExcedentes();
+
+    cp.persistirTransacciones(this->transacciones);
+
+    this->logTick(hora);
+}
+
+void GridManager::liquidarExcedentes()
+{
     /* 
     Consultar si quedaron vendedores en el vector askMap y hacer una transacción
     con cada uno. Esto se hace fuera del while porque mientras se esté dentro 
     del mismo todavía puede aparecer un comprador que consuma esa energía.
     */
-    while(!askMap.empty())
+    while(this->!askMap.empty())
     {
         //obtener el nivel de precio mas bajo del map
         auto ask = this->askMap.begin();
@@ -230,11 +239,7 @@ void GridManager::procesarTick(
             this->askMap.erase(ask);
         }
     }
-
-    cp.persistirTransacciones(this->transacciones);
-
-    this->logTick(hora);
-}
+}    
 
 void GridManager::logTick(int hora) const
 {
