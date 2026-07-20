@@ -27,6 +27,6 @@ int main(void)
     //empieza el programa real
     Simulador s;
     s.ejecutar();
-
-    return 0;
+    
+  return 0;
 }
