@@ -57,7 +57,8 @@ public:
         CapaDatos& cd
     );
 
-    void liquidarExcedentes();
+    void GridManager::liquidarExcedentes(
+        NodoAlmacenamiento& bateria, double precioBaseHorario, int hora);
 
     void logTick(int hora) const;
 };

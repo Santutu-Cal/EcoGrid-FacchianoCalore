@@ -187,21 +187,22 @@ void GridManager::procesarTick(
         }
     }
 
-    this->liquidarExcedentes();
+    this->liquidarExcedentes(bateria, precioBaseHorario, hora);
 
     cp.persistirTransacciones(this->transacciones);
 
     this->logTick(hora);
 }
 
-void GridManager::liquidarExcedentes()
+void GridManager::liquidarExcedentes(
+    NodoAlmacenamiento& bateria, double precioBaseHorario, int hora)
 {
     /* 
     Consultar si quedaron vendedores en el vector askMap y hacer una transacción
     con cada uno. Esto se hace fuera del while porque mientras se esté dentro 
     del mismo todavía puede aparecer un comprador que consuma esa energía.
     */
-    while(this->!askMap.empty())
+    while(!askMap.empty())
     {
         //obtener el nivel de precio mas bajo del map
         auto ask = this->askMap.begin();
