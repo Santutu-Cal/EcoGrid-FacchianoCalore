@@ -16,7 +16,7 @@ public:
     //No creamos un destructor ya que con el que hereda de NodoRed es suficiente
 
     //get propio del consumidor para el perfil
-    PerfilConsumo getPerfil();
+    PerfilConsumo getPerfil() const;
 
     //polimorfismo
     double calcularExcedente() override;

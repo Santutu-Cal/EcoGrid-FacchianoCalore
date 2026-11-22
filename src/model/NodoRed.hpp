@@ -19,6 +19,7 @@ public:
     double getSaldoCuenta() const;
 
     void setBalanceEnergia(double kwh);
+    void setSaldoCuenta(double saldo);
 
     virtual double calcularExcedente() = 0;
 };

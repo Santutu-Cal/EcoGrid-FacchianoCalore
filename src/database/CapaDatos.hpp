@@ -45,6 +45,9 @@ public:
     //establecer conexion
     void conectar();
 
+    //verificar estado de conexion
+    bool estaConectado() const;
+
     //obtener precio base correspondiente
     double obtenerPrecioBase(int hora);
 

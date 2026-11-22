@@ -150,6 +150,12 @@ BEGIN
 
     END IF;
 
+    -- Registrar la lectura en el historial de lecturas
+    INSERT INTO lecturas_historicas
+    (id_nodo, hora, kwh, precio_unitario, tipo_operacion)
+    VALUES
+    (p_id_nodo, p_hora, p_kwh, p_precio, p_tipo_operacion);
+
 END;
 $$;
 

@@ -10,12 +10,14 @@
 #include <iostream>
 #include <algorithm>
 
-#define CANT_CAMPOS 5
+constexpr int CANT_CAMPOS = 5;
 
 class LectorCSV
 {    
 private:
-    Orden parsearLinea(const std::string& linea);
+    Orden parsearLinea(const std::string& linea, int numeroLinea, const std::string& archivo);
+    static std::string trim(const std::string& str);
+    static bool parsearEsCompra(const std::string& campo, int numeroLinea, const std::string& archivo);
 
 public:
     std::vector<Orden> leerOrdenes(const std::string& archivoCSV);  

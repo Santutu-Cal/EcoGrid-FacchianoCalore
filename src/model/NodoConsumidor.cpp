@@ -8,7 +8,7 @@ PerfilConsumo perfil)
 perfil(perfil) {};
 
 //getters. La logica detras de cada uno se hará en el simulador o el gridmanager
-PerfilConsumo NodoConsumidor::getPerfil() 
+PerfilConsumo NodoConsumidor::getPerfil() const
 {
     return perfil;
 }

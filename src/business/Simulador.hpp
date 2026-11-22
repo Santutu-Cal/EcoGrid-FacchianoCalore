@@ -3,9 +3,7 @@
 
 #include "GridManager.hpp"
 #include "LectorCSV.hpp"
-
 #include "CapaDatos.hpp"
-
 #include "NodoRed.hpp"
 #include "NodoAlmacenamiento.hpp"
 
@@ -24,12 +22,14 @@ private:
     std::vector<std::unique_ptr<NodoRed>> nodos;
 
     const std::vector<std::string> archivos{
-        "Datos/ofertas_10.csv",
-        "Datos/ofertas_12.csv",
-        "Datos/ofertas_14.csv",
-        "Datos/ofertas_15.csv",
-        "Datos/ofertas_18.csv"
+        "datos/ofertas_10.csv",
+        "datos/ofertas_12.csv",
+        "datos/ofertas_14.csv",
+        "datos/ofertas_15.csv",
+        "datos/ofertas_18.csv"
     };
+
+    static int extraerHoraDeArchivo(const std::string& rutaArchivo);
 
 public:
     void ejecutar();    

@@ -4,15 +4,15 @@
 #include <chrono>
 #include <iostream>
 
-typedef struct TransaccionEnergia
+struct TransaccionEnergia
 {
-    int idVendedor;
-    int idComprador;
-    double kwh;
-    double precio;
-    int hora;
+    int idVendedor = 0;
+    int idComprador = 0;
+    double kwh = 0.0;
+    double precio = 0.0;
+    int hora = 0;
 
     void logTransaccion() const;
-}TransaccionEnergia;
+};
 
 #endif

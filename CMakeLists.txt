@@ -31,27 +31,27 @@ find_library(SOCI_POSTGRESQL_LIBRARY
 # crea el ejetuable nombrando cada uno de los archivos ".cpp" del proyecto
 add_executable(EcoGrid
 
-    Src/main.cpp
+    src/main.cpp
 
-    Src/business/Simulador.cpp
-    Src/business/GridManager.cpp
-    Src/business/LectorCSV.cpp
+    src/business/Simulador.cpp
+    src/business/GridManager.cpp
+    src/business/LectorCSV.cpp
 
-    Src/model/NodoRed.cpp
-    Src/model/NodoConsumidor.cpp
-    Src/model/NodoProsumidor.cpp
-    Src/model/NodoAlmacenamiento.cpp
-    Src/model/TransaccionEnergia.cpp
+    src/model/NodoRed.cpp
+    src/model/NodoConsumidor.cpp
+    src/model/NodoProsumidor.cpp
+    src/model/NodoAlmacenamiento.cpp
+    src/model/TransaccionEnergia.cpp
 
-    Src/database/CapaDatos.cpp
-    Src/database/ConfigReader.cpp
+    src/database/CapaDatos.cpp
+    src/database/ConfigReader.cpp
 )
 
 # ubicacion de los ".hpps" que deberá encontrar para compilar
 target_include_directories(EcoGrid PRIVATE
-    Src/business
-    Src/model
-    Src/database
+    src/business
+    src/model
+    src/database
     ${SOCI_INCLUDE_DIR}
     ${PostgreSQL_INCLUDE_DIRS}
 )
